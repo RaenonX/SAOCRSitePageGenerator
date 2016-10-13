@@ -16,6 +16,7 @@ namespace SAOCRSitePageGenerator
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Static.InitStaticVariants();
             Application.Run(new Home());
         }
     }

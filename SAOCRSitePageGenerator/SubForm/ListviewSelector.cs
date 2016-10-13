@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace SAOCRSitePageGenerator
 {
-    public partial class Home : Form
+    public partial class ListviewSelector : Form
     {
-        public Home()
+        public ListviewSelector()
         {
             InitializeComponent();
         }

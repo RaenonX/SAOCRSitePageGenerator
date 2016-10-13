@@ -46,14 +46,51 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Home.cs">
+    <Compile Include="Controls\FieldManage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\FieldManage.Designer.cs">
+      <DependentUpon>FieldManage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Global\Delegate.cs" />
+    <Compile Include="SubForm\ListviewSelector.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Home.Designer.cs">
+    <Compile Include="SubForm\ListviewSelector.Designer.cs">
+      <DependentUpon>ListviewSelector.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\ConfigManager.cs" />
+    <Compile Include="Global\ReadOnly.cs" />
+    <Compile Include="Global\Static.cs" />
+    <Compile Include="PageForm\SnippetGenerator.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PageForm\SnippetGenerator.Designer.cs">
+      <DependentUpon>SnippetGenerator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SubForm\NewSnippetInitializer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SubForm\NewSnippetInitializer.Designer.cs">
+      <DependentUpon>NewSnippetInitializer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PageForm\Home.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PageForm\Home.Designer.cs">
       <DependentUpon>Home.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Controls\FieldManage.resx">
+      <DependentUpon>FieldManage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SubForm\ListviewSelector.resx">
+      <DependentUpon>ListviewSelector.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PageForm\Home.resx">
+      <DependentUpon>Home.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -63,6 +100,12 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="PageForm\SnippetGenerator.resx">
+      <DependentUpon>SnippetGenerator.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SubForm\NewSnippetInitializer.resx">
+      <DependentUpon>NewSnippetInitializer.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

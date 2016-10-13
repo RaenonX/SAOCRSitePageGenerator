@@ -1,13 +1,13 @@
 ﻿namespace SAOCRSitePageGenerator
 {
-    partial class Home
+    partial class Component1
     {
         /// <summary>
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
+        /// <summary> 
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
@@ -20,7 +20,7 @@
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
+        #region Component Designer generated code
 
         /// <summary>
         /// Required method for Designer support - do not modify
@@ -28,12 +28,21 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Text = "Form1";
+            this.fieldManage1 = new SAOCRSitePageGenerator.FieldManage();
+            // 
+            // fieldManage1
+            // 
+            this.fieldManage1.Font = new System.Drawing.Font("Microsoft JhengHei", 9F);
+            this.fieldManage1.Location = new System.Drawing.Point(0, 0);
+            this.fieldManage1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.fieldManage1.Name = "fieldManage1";
+            this.fieldManage1.Size = new System.Drawing.Size(1218, 66);
+            this.fieldManage1.TabIndex = 0;
+
         }
 
         #endregion
+
+        private FieldManage fieldManage1;
     }
 }
-
