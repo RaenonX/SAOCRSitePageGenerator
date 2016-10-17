@@ -225,6 +225,7 @@ namespace SAOCRSitePageGenerator
             DataColumn DC = new DataColumn(ColumnName, ColumnDataType);
             DC.Unique = ColumnName == ReadOnly.SnippetFieldName;
             DC.AllowDBNull = !(ColumnName == ReadOnly.SnippetFieldName);
+            DC.AutoIncrement = ColumnName == ReadOnly.SnippetFieldIndex;
             return DC;
         }
 

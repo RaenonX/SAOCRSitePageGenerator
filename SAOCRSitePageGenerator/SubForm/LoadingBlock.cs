@@ -16,5 +16,11 @@ namespace SAOCRSitePageGenerator
         {
             InitializeComponent();
         }
+
+        public LoadingBlock(string Text)
+        {
+            InitializeComponent();
+            label1.Text = Text;
+        }
     }
 }

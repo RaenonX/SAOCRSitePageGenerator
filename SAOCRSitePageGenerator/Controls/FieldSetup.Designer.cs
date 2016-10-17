@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.Auto = new System.Windows.Forms.GroupBox();
-            this.SearchResult = new System.Windows.Forms.Label();
             this.LoopUse = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
             this.DTReturnColumnName = new System.Windows.Forms.TextBox();
@@ -40,10 +39,12 @@
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.DT = new System.Windows.Forms.TextBox();
+            this.SearchResult = new System.Windows.Forms.Label();
             this.ReadOnlyAttribute = new System.Windows.Forms.CheckBox();
             this.AutoFill = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.Panel1 = new System.Windows.Forms.Panel();
+            this.OrderIndex = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.ManualValue = new System.Windows.Forms.TextBox();
             this.Process = new System.Windows.Forms.GroupBox();
@@ -57,7 +58,6 @@
             this.ProcessCMD = new System.Windows.Forms.TextBox();
             this.Internal = new System.Windows.Forms.CheckBox();
             this.FieldName = new System.Windows.Forms.TextBox();
-            this.OrderIndex = new System.Windows.Forms.Label();
             this.Auto.SuspendLayout();
             this.Panel1.SuspendLayout();
             this.Process.SuspendLayout();
@@ -65,6 +65,7 @@
             // 
             // Auto
             // 
+            this.Auto.Controls.Add(this.SearchResult);
             this.Auto.Controls.Add(this.LoopUse);
             this.Auto.Controls.Add(this.label2);
             this.Auto.Controls.Add(this.DTReturnColumnName);
@@ -75,25 +76,12 @@
             this.Auto.Controls.Add(this.label6);
             this.Auto.Controls.Add(this.label5);
             this.Auto.Controls.Add(this.DT);
-            this.Auto.Controls.Add(this.SearchResult);
             this.Auto.Location = new System.Drawing.Point(247, 0);
             this.Auto.Name = "Auto";
             this.Auto.Size = new System.Drawing.Size(604, 80);
             this.Auto.TabIndex = 18;
             this.Auto.TabStop = false;
             this.Auto.Text = "Auto";
-            // 
-            // SearchResult
-            // 
-            this.SearchResult.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.SearchResult.Location = new System.Drawing.Point(6, 22);
-            this.SearchResult.Margin = new System.Windows.Forms.Padding(3);
-            this.SearchResult.Name = "SearchResult";
-            this.SearchResult.Size = new System.Drawing.Size(505, 52);
-            this.SearchResult.TabIndex = 19;
-            this.SearchResult.Text = "Search process not execute.";
-            this.SearchResult.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.SearchResult.Visible = false;
             // 
             // LoopUse
             // 
@@ -189,6 +177,18 @@
             this.DT.Size = new System.Drawing.Size(96, 23);
             this.DT.TabIndex = 8;
             // 
+            // SearchResult
+            // 
+            this.SearchResult.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.SearchResult.Location = new System.Drawing.Point(6, 22);
+            this.SearchResult.Margin = new System.Windows.Forms.Padding(3);
+            this.SearchResult.Name = "SearchResult";
+            this.SearchResult.Size = new System.Drawing.Size(505, 52);
+            this.SearchResult.TabIndex = 19;
+            this.SearchResult.Text = "Search process not execute.";
+            this.SearchResult.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.SearchResult.Visible = false;
+            // 
             // ReadOnlyAttribute
             // 
             this.ReadOnlyAttribute.Enabled = false;
@@ -237,6 +237,16 @@
             this.Panel1.Name = "Panel1";
             this.Panel1.Size = new System.Drawing.Size(1221, 85);
             this.Panel1.TabIndex = 19;
+            // 
+            // OrderIndex
+            // 
+            this.OrderIndex.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.OrderIndex.Font = new System.Drawing.Font("Consolas", 11F);
+            this.OrderIndex.Location = new System.Drawing.Point(3, 3);
+            this.OrderIndex.Name = "OrderIndex";
+            this.OrderIndex.Size = new System.Drawing.Size(30, 23);
+            this.OrderIndex.TabIndex = 24;
+            this.OrderIndex.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label7
             // 
@@ -367,16 +377,6 @@
             this.FieldName.ReadOnly = true;
             this.FieldName.Size = new System.Drawing.Size(123, 23);
             this.FieldName.TabIndex = 21;
-            // 
-            // Order
-            // 
-            this.OrderIndex.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.OrderIndex.Font = new System.Drawing.Font("Consolas", 11F);
-            this.OrderIndex.Location = new System.Drawing.Point(3, 3);
-            this.OrderIndex.Name = "Order";
-            this.OrderIndex.Size = new System.Drawing.Size(30, 23);
-            this.OrderIndex.TabIndex = 24;
-            this.OrderIndex.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // FieldSetup
             // 

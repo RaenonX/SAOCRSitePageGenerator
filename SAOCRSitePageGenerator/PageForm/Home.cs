@@ -139,7 +139,21 @@ namespace SAOCRSitePageGenerator
 
         private void DSEdit_Click(object sender, EventArgs e)
         {
-            if (EditDataSet(new Guid(DSList.SelectedItems[0].SubItems[ReadOnly.SourceDataSetGUID].Text)) == DialogResult.OK)
+            DataSetEditor DTE;
+
+            using (LoadingBlock LB = new LoadingBlock())
+            {
+                LB.StartPosition = FormStartPosition.CenterScreen;
+
+                LB.Show(this);
+                Application.DoEvents();
+
+                DTE = EditDataSet(new Guid(DSList.SelectedItems[0].SubItems[ReadOnly.SourceDataSetGUID].Text));
+
+                LB.Close();
+                Application.DoEvents();
+            }
+            if (DTE.ShowDialog() == DialogResult.OK)
             {
                 RefreshDSList();
             }
@@ -181,12 +195,34 @@ namespace SAOCRSitePageGenerator
 
         private void DSLoad_Click(object sender, EventArgs e)
         {
-            LoadDataSet();
+            using (LoadingBlock LB = new LoadingBlock())
+            {
+                LB.StartPosition = FormStartPosition.CenterScreen;
+
+                LB.Show(this);
+                Application.DoEvents();
+
+                LoadDataSet();
+
+                LB.Close();
+                Application.DoEvents();
+            }
         }
 
         private void DSList_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            LoadDataSet();
+            using (LoadingBlock LB = new LoadingBlock())
+            {
+                LB.StartPosition = FormStartPosition.CenterScreen;
+
+                LB.Show(this);
+                Application.DoEvents();
+
+                LoadDataSet();
+
+                LB.Close();
+                Application.DoEvents();
+            }
         }
 
         private void DSUnload_Click(object sender, EventArgs e)
@@ -418,10 +454,10 @@ namespace SAOCRSitePageGenerator
             return DTE.ShowDialog();
         }
 
-        private DialogResult EditDataSet(Guid DSGuid)
+        private DataSetEditor EditDataSet(Guid DSGuid)
         {
             DataSetEditor DTE = new DataSetEditor(DSGuid);
-            return DTE.ShowDialog();
+            return DTE;
         }
 
         private void LoadDataSet()

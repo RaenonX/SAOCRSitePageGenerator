@@ -15,7 +15,7 @@ namespace SAOCRSitePageGenerator
     public partial class SnippetExecutor : Form
     {
         bool isRepeatedSnippet;
-        DataTable FieldList;
+        DataTable FieldList, ProcessedFL;
         KeyValuePair<string, string> SnippetInfo;
         FieldSetupPanel FSP;
 
@@ -44,21 +44,23 @@ namespace SAOCRSitePageGenerator
             string SnippetPath = ReadOnly.SnippetsPath + "/" + SnippetInfo.Key;
 
             FieldList = LoadFieldList(SnippetInfo.Key);
+            ProcessedFL = GetSortedFieldList(FieldList);
             GenerateAndShowFieldSetupPanel(FieldList, SearchTest_Click);
+
             using (ConfigManager CM = new ConfigManager(SnippetPath + "/" + ReadOnly.SnippetStructConfig))
             {
                 isRepeatedSnippet = Convert.ToBoolean(CM.GetConfig(ReadOnly.SnippetIsRepeatedSnippet));
                 OutputDestination.Text = CM.GetConfig(ReadOnly.SnippetDestination);
             }
 
-            SetGenerateButtonEnabled(FSP.Controls.Count > 1);
+            SetGenerateButtonEnabled(FSP.FieldCollection.Count > 1);
         }
         #endregion
 
         #region Events
         private string SearchTest_Click(object sender, EventArgs e)
         {
-            return GetDTQueryResult((FieldSetup)sender, true);
+            return GetDTQueryResult(((FieldSetup)sender).GetFieldName(), true);
         }
 
         private void Generate_Click(object sender, EventArgs e)
@@ -110,6 +112,12 @@ namespace SAOCRSitePageGenerator
             return SB;
         }
 
+        private DataTable GetSortedFieldList(DataTable FieldList)
+        {
+            DataView DV = FieldList.AsDataView();
+            DV.Sort = ReadOnly.SnippetFieldIndex + " ASC, " + ReadOnly.SnippetFieldName + " ASC";
+            return DV.ToTable();
+        }
         #endregion
 
         private void GenerateSnippet(bool isRepeatedSnippet)
@@ -125,22 +133,25 @@ namespace SAOCRSitePageGenerator
                 }
                 else
                 {
-                    int MaxProgressCount = 4;
+                    int MaxProgressCount = 5;
 
-                    ReportProgress(1, MaxProgressCount, "Replacing field with manual data...");
-                    ReplaceFields(ref SB, CM.GetConfig(ReadOnly.SnippetFieldBracketL), CM.GetConfig(ReadOnly.SnippetFieldBracketR));
-
-                    ReportProgress(2, MaxProgressCount, "Checking export file path...");
+                    ReportProgress(1, MaxProgressCount, "Checking export file path...");
                     if (!CheckSnippetExportFile(SnippetExportPath))
                     {
                         ReportProgress(0, 0, "Export process aborted.");
                         return;
                     }
 
-                    ReportProgress(3, MaxProgressCount, "Exporting snippet...");
+                    ReportProgress(2, MaxProgressCount, "Inserting value to datatable...");
+                    InsertValuesToProcessedDataTable();
+
+                    ReportProgress(3, MaxProgressCount, "Replacing field with manual data...");
+                    ReplaceFields(ref SB, CM.GetConfig(ReadOnly.SnippetFieldBracketL), CM.GetConfig(ReadOnly.SnippetFieldBracketR));
+
+                    ReportProgress(4, MaxProgressCount, "Exporting snippet...");
                     WriteSnippet(SB, SnippetExportPath);
 
-                    ReportProgress(4, MaxProgressCount, "Checking open exported snippet or not.");
+                    ReportProgress(5, MaxProgressCount, "Checking open exported snippet or not.");
                     CheckToOpenExportedSnippet(SnippetExportPath);
 
                     DialogResult = DialogResult.OK;
@@ -148,12 +159,47 @@ namespace SAOCRSitePageGenerator
             }
         }
 
-        private string GetDTQueryResult(FieldSetup FS, bool isLayout)
+        private string GetDTQueryResult(string FieldName, bool isLayout)
         {
+            FieldSetup FS;
+
+            try
+            {
+                FS = FSP.FieldCollection[FieldName];
+            }
+            catch (Exception e)
+            {
+                return isLayout ? "Error when getting control from collection. Exception: " + e.GetType().ToString() + ", Message: " + e.Message : string.Empty;
+            }
+
             string DSNameInFS = FS.GetDataSetName();
             string DTNameInFS = FS.GetDataTableName();
-            string DTSelectQuery = FS.GetDataTableSelectQuery();
             string DTReturnColumnName = FS.GetDataTableReturnColumnName();
+
+            string DTSelectQuery = FS.GetDataTableSelectQuery();
+            List<string> FieldToInputList = new List<string>();
+            int IDXStart = DTSelectQuery.IndexOf(ReadOnly.FieldInQueryIdentifyCharL);
+            int IDXEnd = DTSelectQuery.IndexOf(ReadOnly.FieldInQueryIdentifyCharR);
+
+            while (IDXStart > -1 && IDXEnd > -1)
+            {
+                string OperatorRemovedFieldName = DTSelectQuery.Substring(IDXStart, IDXEnd - IDXStart).Replace(ReadOnly.FieldInQueryIdentifyCharL, string.Empty).Replace(ReadOnly.FieldInQueryIdentifyCharR, string.Empty);
+
+                FieldToInputList.Add(OperatorRemovedFieldName);
+                DTSelectQuery = DTSelectQuery.Substring(IDXEnd);
+                IDXStart = DTSelectQuery.IndexOf(ReadOnly.FieldInQueryIdentifyCharL);
+                IDXEnd = DTSelectQuery.IndexOf(ReadOnly.FieldInQueryIdentifyCharR);
+            }
+
+            foreach (string Field in FieldToInputList)
+            {
+                DTSelectQuery = FS.GetDataTableSelectQuery();
+
+                string OldStr = ReadOnly.FieldInQueryIdentifyCharL + Field + ReadOnly.FieldInQueryIdentifyCharR;
+                string NewStr = "'" + GetValueFromFieldListDT(Field, false) + "'";
+
+                DTSelectQuery = DTSelectQuery.Replace(OldStr, NewStr);
+            }
 
             if (!Static.SnippetExternalSourceName.ContainsValue(DSNameInFS))
             {
@@ -188,46 +234,37 @@ namespace SAOCRSitePageGenerator
         }
 
         #region Snippet Generating Process
+        private void InsertValuesToProcessedDataTable()
+        {
+            foreach (DataRow DR in ProcessedFL.Rows)
+            {
+                string FieldName = Convert.ToString(DR[ReadOnly.SnippetFieldName]);
+                bool isAuto = GetBooleanFromDataRow(DR, ReadOnly.SnippetFieldAutoFill);
+                bool isInternal = GetBooleanFromDataRow(DR, ReadOnly.SnippetFieldForInternalUse);
+                DataRow DRT = ProcessedFL.Select("[" + ReadOnly.SnippetFieldName + "]='" + FieldName + "'")[0];
+
+                string QueryResult = isAuto ? GetDTQueryResult(FieldName, false) : FSP.FieldCollection[FieldName].GetManualValue();
+
+                DRT[ReadOnly.SnippetFieldManualValue] = QueryResult;
+            }
+        }
 
         private void ReplaceFields(ref StringBuilder SB, string BracketL, string BracketR)
         {
-            using (DataTable TempDTForInternalUse = FieldList.Copy())
+            foreach (DataRow DR in ProcessedFL.Rows)
             {
-                foreach (DataRow DR in FieldList.Rows)
-                {
-                    string FieldName = Convert.ToString(DR[ReadOnly.SnippetFieldName]);
-                    string FieldSectionToReplace = BracketL + FieldName + BracketR;
-                    bool isAuto = Convert.ToBoolean(DR[ReadOnly.SnippetFieldAutoFill] == DBNull.Value ? false : DR[ReadOnly.SnippetFieldAutoFill]);
-                    bool isInternal = Convert.ToBoolean(DR[ReadOnly.SnippetFieldForInternalUse] == DBNull.Value ? false : DR[ReadOnly.SnippetFieldForInternalUse]);
+                bool isInternal = GetBooleanFromDataRow(DR, ReadOnly.SnippetFieldForInternalUse);
+                string OldStr = BracketL + DR[ReadOnly.SnippetFieldName] + BracketR;
+                string NewStr = DR[ReadOnly.SnippetFieldManualValue].ToString();
+                SB.Replace(OldStr, isInternal ? string.Empty : NewStr);
+            }
+        }
 
-                    if (isInternal)
-                    {
-                        SB = SB.Replace(FieldSectionToReplace, FSP.FieldCollection[FieldName].GetManualValue());
-
-                        DataRow[] DRA = TempDTForInternalUse.Select("[" + ReadOnly.SnippetFieldName + "]='" + FieldName + "'");
-                        DataRow DRT = DRA[0];
-
-                        if (isAuto)
-                        {
-                            DRT[ReadOnly.SnippetFieldManualValue] = GetDTQueryResult(FSP.FieldCollection[FieldName], false);
-                        }
-                        else
-                        {
-                            DRT[ReadOnly.SnippetFieldManualValue] = FSP.FieldCollection[FieldName].GetManualValue();
-                        }
-                    }
-                    else
-                    {
-                        if (isAuto)
-                        {
-                            SB = SB.Replace(FieldSectionToReplace, GetDTQueryResult(FSP.FieldCollection[FieldName], false));
-                        }
-                        else
-                        {
-                            SB = SB.Replace(FieldSectionToReplace, FSP.FieldCollection[FieldName].GetManualValue());
-                        }
-                    }
-                }
+        private void WriteSnippet(StringBuilder SB, string SnippetExportPath)
+        {
+            using (StreamWriter SW = new StreamWriter(SnippetExportPath))
+            {
+                SW.Write(SB.ToString());
             }
         }
 
@@ -253,14 +290,6 @@ namespace SAOCRSitePageGenerator
             }
         }
 
-        private void WriteSnippet(StringBuilder SB, string SnippetExportPath)
-        {
-            using (StreamWriter SW = new StreamWriter(SnippetExportPath))
-            {
-                SW.Write(SB.ToString());
-            }
-        }
-
         private void CheckToOpenExportedSnippet(string SnippetExportPath)
         {
             if (MessageBox.Show("Snippet exporting completed.\n\nExported Path: " + SnippetExportPath + "\nOpen exported snippet?", "Snippet exporting completed", MessageBoxButtons.YesNo) == DialogResult.Yes)
@@ -268,9 +297,25 @@ namespace SAOCRSitePageGenerator
                 Process.Start(SnippetExportPath);
             }
         }
-
         #endregion
 
+        private bool GetBooleanFromDataRow(DataRow DR, string ColumnName)
+        {
+            try
+            {
+                return Convert.ToBoolean(DR[ColumnName] == DBNull.Value ? false : DR[ColumnName]);
+            }
+            catch (ArgumentException)
+            {
+                throw new DataColumnNotExistException();
+            }
+        }
+
+        private string GetValueFromFieldListDT(string FieldName, bool isOriginal)
+        {
+            DataRow[] Value = (isOriginal ? FieldList : ProcessedFL).Select("[" + ReadOnly.SnippetFieldName + "]='" + FieldName + "'");
+            return Value.Length > 0 ? Value[0][ReadOnly.SnippetFieldManualValue].ToString() : string.Empty;
+        }
         #endregion
     }
 }

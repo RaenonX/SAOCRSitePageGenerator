@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.FileIO;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -18,6 +19,8 @@ namespace SAOCRSitePageGenerator
         DataColumn DCinDCManager;
         DataSet DS;
         Guid DSGuid, CurrentDTGuid;
+
+        BackgroundWorker CsvImporterWorker = new BackgroundWorker();
 
         #region Initialize
         public DataSetEditor()
@@ -61,17 +64,27 @@ namespace SAOCRSitePageGenerator
             DTRemarkToAdd.KeyDown += DTRemarkToAdd_KeyDown;
 
             DSMemo.KeyDown += DSMemo_KeyDown;
+
+            CsvImport.Click += CsvImport_Click;
+            CsvPathBrowse.Click += CsvPathBrowse_Click;
+            CsvImporterWorker.DoWork += CsvImporterWorker_DoWork;
+            CsvImporterWorker.ProgressChanged += CsvImporterWorker_ProgressChanged;
+            CsvImporterWorker.RunWorkerCompleted += CsvImporterWorker_RunWorkerCompleted;
         }
 
         private void Initialize()
         {
             UpdateDataTableView();
             RefreshDataTableList();
+
             if (isEdit)
             {
                 SetBasicInfoToDSBasicInfoArea(DSGuid);
                 LoadDataSetDocument(DSGuid);
             }
+            
+            CsvImporterWorker.WorkerReportsProgress = true;
+            CsvImporterWorker.WorkerSupportsCancellation = true;
         }
 
         private void InitializeNewDS()
@@ -97,12 +110,24 @@ namespace SAOCRSitePageGenerator
         #region Events
         private void Save_Click(object sender, EventArgs e)
         {
-            WriteDataSetBasicInfo();
-            WriteDataDataSetXML();
-            WriteDSMemo();
+            using (LoadingBlock LB = new LoadingBlock((isEdit ? "Updating" : "Saving") + " DataSet..."))
+            {
+                LB.StartPosition = FormStartPosition.CenterScreen;
+
+                LB.Show(this);
+                Application.DoEvents();
+
+                WriteDataSetBasicInfo();
+                WriteDataDataSetXML();
+                WriteDSMemo();
+
+                LB.Close();
+                Application.DoEvents();
+            }
+
             using (ConfigManager CM = new ConfigManager(ReadOnly.SourceDataSetDict))
             {
-                MessageBox.Show("DataSet " + (isEdit ? "modifying" : "creating" + " completed.") + "\n\nDataSet Name: " + CM.GetConfig(DSGuid.ToString()) + "\nDataSet GUID: " + DSGuid.ToString());
+                MessageBox.Show("DataSet " + (isEdit ? "modifying" : "creating") + "completed.\n\nDataSet Name: " + CM.GetConfig(DSGuid.ToString()) + "\nDataSet GUID: " + DSGuid.ToString());
             }
             DialogResult = DialogResult.OK;
         }
@@ -224,6 +249,45 @@ namespace SAOCRSitePageGenerator
         }
         #endregion
 
+        #region CSV Importer
+        private void CsvPathBrowse_Click(object sender, EventArgs e)
+        {
+            CsvPath.Text = BrowseAndGetFilePath();
+        }
+
+        private void CsvImport_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(CsvDelim.Text))
+            {
+                MessageBox.Show("Please insert a delimeter, then try again.");
+            } else if (string.IsNullOrEmpty(CsvPath.Text)) {
+                MessageBox.Show("Please choose csv file path to import.");
+                CsvPathBrowse_Click(sender, e);
+            } else
+            {
+                SetCSVImporterButtonEnabled(false);
+                SetDTBasicInfoSyncFromCSVImporter();
+                CsvImporterWorker.RunWorkerAsync();
+            }
+        }
+
+        private void CsvImporterWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            SetCSVImporterButtonEnabled(true);
+            CreateNewDT((DataTable)e.Result);
+        }
+
+        private void CsvImporterWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            SetCsvImportProgressText(e.UserState.ToString());
+        }
+
+        private void CsvImporterWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            e.Result = ImportCSV();
+        }
+        #endregion
+
         #endregion
 
         #region Methods
@@ -254,6 +318,23 @@ namespace SAOCRSitePageGenerator
             }
         }
 
+        private void SetDTBasicInfoSyncFromCSVImporter()
+        {
+            DTNameToAdd.Text = CsvDTName.Text;
+            DTRemarkToAdd.Text = CsvDTRemark.Text;
+        }
+
+        private void SetCSVImporterButtonEnabled(bool Enabled)
+        {
+            CsvImport.Enabled = Enabled;
+            CsvPathBrowse.Enabled = Enabled;
+        }
+
+        private void SetCsvImportProgressText(string Text)
+        {
+            CsvImportProgress.Text = Text;
+        }
+             
         private void LoadDataSetDocument(Guid DSGuid)
         {
             using (StreamReader SR = new StreamReader(ReadOnly.SourcePath + "/" + DSGuid.ToString() + ReadOnly.SourceMemoExtension))
@@ -377,6 +458,17 @@ namespace SAOCRSitePageGenerator
             RefreshDataTableList();
         }
 
+        private void CreateNewDT(DataTable DT)
+        {
+            Guid DTGuid = Guid.NewGuid();
+
+            DT.TableName = DTGuid.ToString();
+            RegisterDTToDataSet(DTGuid);
+            DS.Tables.Add(DT);
+
+            RefreshDataTableList();
+        }
+
         private void RemoveDT()
         {
             Guid DTGuid = new Guid(DTList.SelectedItems[0].SubItems[ReadOnly.SourceDataTableGUID].Text);
@@ -466,12 +558,67 @@ namespace SAOCRSitePageGenerator
                     LVI.SubItems[Key].Text = DR[Key].ToString();
                 }
                 DataTable DT = DS.Tables[DR[ReadOnly.SourceDataTableGUID].ToString()];
-                LVI.SubItems[ReadOnly.SourceDataTableColumnCount].Text = DT == null ? DT.Columns.Count.ToString() : "DT is Null";
-                LVI.SubItems[ReadOnly.SourceDataTableRowCount].Text = DT == null ? DT.Rows.Count.ToString() : "DT is Null";
+                LVI.SubItems[ReadOnly.SourceDataTableColumnCount].Text = DT == null ? "DT is Null" : DT.Columns.Count.ToString();
+                LVI.SubItems[ReadOnly.SourceDataTableRowCount].Text = DT == null ? "DT is Null" : DT.Rows.Count.ToString();
                 LVI.Text = DR[ReadOnly.SourceDataTableGUID].ToString();
                 DT.Dispose();
                 DTList.Items.Add(LVI);
             }
+        }
+        #endregion
+
+        #region CSV Importer
+        private string BrowseAndGetFilePath()
+        {
+            if (CSVSelector.ShowDialog() == DialogResult.OK)
+            {
+                return CSVSelector.FileName;
+            } else
+            {
+                return string.Empty;
+            }
+        }
+
+        private DataTable ImportCSV()
+        {
+            using (TextFieldParser TFP = new TextFieldParser(CsvPath.Text))
+            {
+                using (DataTable DT = new DataTable())
+                {
+                    CsvImporterWorker.ReportProgress(0, "Importing...");
+                    TFP.Delimiters = new string[] { CsvDelim.Text };
+
+                    while (!TFP.EndOfData)
+                    {
+                        try
+                        {
+                            string[] ReadData = TFP.ReadFields();
+
+                            while (DT.Columns.Count < ReadData.Length)
+                            {
+                                DT.Columns.Add(CreateNewDataColumn());
+                            }
+                            
+                            DT.Rows.Add(GetStringArrayImportedDataRow(DT, ReadData));
+                        } catch (MalformedLineException) { }
+                    }
+                    CsvImporterWorker.ReportProgress(0, "Importing Completed.");
+                    return DT;
+                }
+            }
+        }
+
+        private DataColumn CreateNewDataColumn()
+        {
+            DataColumn DC = new DataColumn(string.Empty, typeof(string));
+            return DC;
+        }
+
+        private DataRow GetStringArrayImportedDataRow(DataTable DT, string[] Array)
+        {
+            DataRow DR = DT.NewRow();
+            DR.ItemArray = Array;
+            return DR;
         }
         #endregion
 
@@ -481,6 +628,7 @@ namespace SAOCRSitePageGenerator
             DS.ReadXml(Path);
             return DS;
         }
+
 
         private ListViewItem CreateListViewItemFitToListView(ListView LV)
         {

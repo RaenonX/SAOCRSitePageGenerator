@@ -233,6 +233,11 @@ namespace SAOCRSitePageGenerator
         {
             return DTReturnColumnName.Text;
         }
+
+        public string GetFieldName()
+        {
+            return FieldName.Text;
+        }
         #endregion
     }
 }
