@@ -46,11 +46,45 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\FieldManage.cs">
+    <Compile Include="Controls\FieldSetup.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\FieldManage.Designer.cs">
-      <DependentUpon>FieldManage.cs</DependentUpon>
+    <Compile Include="Controls\FieldSetup.Designer.cs">
+      <DependentUpon>FieldSetup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\FieldSetupPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\FieldSetupPanel.Designer.cs">
+      <DependentUpon>FieldSetupPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Global\Exception.cs" />
+    <Compile Include="Global\Enum.cs" />
+    <Compile Include="Interfaces\IHasFuncAboutFolderBrowserDialog.cs" />
+    <Compile Include="Controls\ListViewController.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ListViewController.Designer.cs">
+      <DependentUpon>ListViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\StringProcessor.cs" />
+    <Compile Include="SubForm\StringProcessTester.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SubForm\StringProcessTester.Designer.cs">
+      <DependentUpon>StringProcessTester.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SubForm\LoadingBlock.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SubForm\LoadingBlock.Designer.cs">
+      <DependentUpon>LoadingBlock.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PageForm\DataTableEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PageForm\DataTableEditor.Designer.cs">
+      <DependentUpon>DataTableEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Global\Delegate.cs" />
     <Compile Include="SubForm\ListviewSelector.cs">
@@ -62,17 +96,17 @@
     <Compile Include="Modules\ConfigManager.cs" />
     <Compile Include="Global\ReadOnly.cs" />
     <Compile Include="Global\Static.cs" />
-    <Compile Include="PageForm\SnippetGenerator.cs">
+    <Compile Include="PageForm\SnippetExecutor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="PageForm\SnippetGenerator.Designer.cs">
-      <DependentUpon>SnippetGenerator.cs</DependentUpon>
+    <Compile Include="PageForm\SnippetExecutor.Designer.cs">
+      <DependentUpon>SnippetExecutor.cs</DependentUpon>
     </Compile>
-    <Compile Include="SubForm\NewSnippetInitializer.cs">
+    <Compile Include="PageForm\SnippetEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SubForm\NewSnippetInitializer.Designer.cs">
-      <DependentUpon>NewSnippetInitializer.cs</DependentUpon>
+    <Compile Include="PageForm\SnippetEditor.Designer.cs">
+      <DependentUpon>SnippetEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="PageForm\Home.cs">
       <SubType>Form</SubType>
@@ -82,8 +116,20 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Controls\FieldManage.resx">
-      <DependentUpon>FieldManage.cs</DependentUpon>
+    <EmbeddedResource Include="Controls\FieldSetup.resx">
+      <DependentUpon>FieldSetup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\FieldSetupPanel.resx">
+      <DependentUpon>FieldSetupPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ListViewController.resx">
+      <DependentUpon>ListViewController.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SubForm\StringProcessTester.resx">
+      <DependentUpon>StringProcessTester.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PageForm\DataTableEditor.resx">
+      <DependentUpon>DataTableEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SubForm\ListviewSelector.resx">
       <DependentUpon>ListviewSelector.cs</DependentUpon>
@@ -100,11 +146,14 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="PageForm\SnippetGenerator.resx">
-      <DependentUpon>SnippetGenerator.cs</DependentUpon>
+    <EmbeddedResource Include="PageForm\SnippetExecutor.resx">
+      <DependentUpon>SnippetExecutor.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="SubForm\NewSnippetInitializer.resx">
-      <DependentUpon>NewSnippetInitializer.cs</DependentUpon>
+    <EmbeddedResource Include="PageForm\SnippetEditor.resx">
+      <DependentUpon>SnippetEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SubForm\LoadingBlock.resx">
+      <DependentUpon>LoadingBlock.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -118,6 +167,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\DataSources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

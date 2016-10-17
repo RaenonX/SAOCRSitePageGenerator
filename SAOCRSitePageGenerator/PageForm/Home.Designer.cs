@@ -28,53 +28,62 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.SnippetList = new System.Windows.Forms.ListView();
+            this.components = new System.ComponentModel.Container();
+            this.SNPList = new System.Windows.Forms.ListView();
             this.Empty = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SnippetName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.CreatedDate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.LastUsedDate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.Notes = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.FolderKey = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.Open = new System.Windows.Forms.Button();
-            this.New = new System.Windows.Forms.Button();
-            this.RefreshList = new System.Windows.Forms.Button();
-            this.Delete = new System.Windows.Forms.Button();
-            this.Edit = new System.Windows.Forms.Button();
+            this.Remark = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.SnippetGUID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.SNPOpen = new System.Windows.Forms.Button();
+            this.SNPNew = new System.Windows.Forms.Button();
+            this.SNPRefresh = new System.Windows.Forms.Button();
+            this.SNPDelete = new System.Windows.Forms.Button();
+            this.SNPEdit = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.LoadDT = new System.Windows.Forms.Button();
-            this.SelectDT = new System.Windows.Forms.Button();
-            this.DatatableList = new System.Windows.Forms.ListView();
-            this.DataSet = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.DataSource = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.NewDT = new System.Windows.Forms.Button();
+            this.DSRemove = new System.Windows.Forms.Button();
+            this.DSEdit = new System.Windows.Forms.Button();
+            this.DSListRefresh = new System.Windows.Forms.Button();
+            this.DSNew = new System.Windows.Forms.Button();
+            this.DSList = new System.Windows.Forms.ListView();
             this.Empty0 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.DataSetName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.DataTableList = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.DataSetLoaded = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.DataSetGUID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.DSLoad = new System.Windows.Forms.Button();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.DSListMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.DSUnload = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
-            // SnippetList
+            // SNPList
             // 
-            this.SnippetList.Activation = System.Windows.Forms.ItemActivation.TwoClick;
-            this.SnippetList.AllowColumnReorder = true;
-            this.SnippetList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.SNPList.Activation = System.Windows.Forms.ItemActivation.TwoClick;
+            this.SNPList.AllowColumnReorder = true;
+            this.SNPList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.Empty,
             this.SnippetName,
             this.CreatedDate,
             this.LastUsedDate,
-            this.Notes,
-            this.FolderKey});
-            this.SnippetList.FullRowSelect = true;
-            this.SnippetList.GridLines = true;
-            this.SnippetList.HideSelection = false;
-            this.SnippetList.ImeMode = System.Windows.Forms.ImeMode.Off;
-            this.SnippetList.Location = new System.Drawing.Point(12, 38);
-            this.SnippetList.MultiSelect = false;
-            this.SnippetList.Name = "SnippetList";
-            this.SnippetList.ShowItemToolTips = true;
-            this.SnippetList.Size = new System.Drawing.Size(898, 520);
-            this.SnippetList.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            this.SnippetList.TabIndex = 0;
-            this.SnippetList.UseCompatibleStateImageBehavior = false;
-            this.SnippetList.View = System.Windows.Forms.View.Details;
+            this.Remark,
+            this.SnippetGUID});
+            this.SNPList.FullRowSelect = true;
+            this.SNPList.GridLines = true;
+            this.SNPList.HideSelection = false;
+            this.SNPList.ImeMode = System.Windows.Forms.ImeMode.Off;
+            this.SNPList.Location = new System.Drawing.Point(6, 48);
+            this.SNPList.MultiSelect = false;
+            this.SNPList.Name = "SNPList";
+            this.SNPList.ShowItemToolTips = true;
+            this.SNPList.Size = new System.Drawing.Size(885, 286);
+            this.SNPList.Sorting = System.Windows.Forms.SortOrder.Ascending;
+            this.SNPList.TabIndex = 0;
+            this.SNPList.UseCompatibleStateImageBehavior = false;
+            this.SNPList.View = System.Windows.Forms.View.Details;
             // 
             // Empty
             // 
@@ -96,155 +105,215 @@
             this.LastUsedDate.Text = "Last Used";
             this.LastUsedDate.Width = 135;
             // 
-            // Notes
+            // Remark
             // 
-            this.Notes.Text = "Notes";
-            this.Notes.Width = 150;
+            this.Remark.Text = "Remark";
+            this.Remark.Width = 150;
             // 
-            // FolderKey
+            // SnippetGUID
             // 
-            this.FolderKey.Text = "Folder Key";
-            this.FolderKey.Width = 270;
+            this.SnippetGUID.Text = "Snippet GUID";
+            this.SnippetGUID.Width = 270;
             // 
-            // Open
+            // SNPOpen
             // 
-            this.Open.Enabled = false;
-            this.Open.Location = new System.Drawing.Point(825, 564);
-            this.Open.Name = "Open";
-            this.Open.Size = new System.Drawing.Size(85, 28);
-            this.Open.TabIndex = 1;
-            this.Open.Text = "Open";
-            this.Open.UseVisualStyleBackColor = true;
+            this.SNPOpen.Enabled = false;
+            this.SNPOpen.Location = new System.Drawing.Point(806, 340);
+            this.SNPOpen.Name = "SNPOpen";
+            this.SNPOpen.Size = new System.Drawing.Size(85, 28);
+            this.SNPOpen.TabIndex = 1;
+            this.SNPOpen.Text = "Open";
+            this.SNPOpen.UseVisualStyleBackColor = true;
             // 
-            // New
+            // SNPNew
             // 
-            this.New.Location = new System.Drawing.Point(12, 564);
-            this.New.Name = "New";
-            this.New.Size = new System.Drawing.Size(100, 28);
-            this.New.TabIndex = 2;
-            this.New.Text = "New Snippet";
-            this.New.UseVisualStyleBackColor = true;
+            this.SNPNew.Location = new System.Drawing.Point(6, 340);
+            this.SNPNew.Name = "SNPNew";
+            this.SNPNew.Size = new System.Drawing.Size(100, 28);
+            this.SNPNew.TabIndex = 2;
+            this.SNPNew.Text = "New Snippet";
+            this.SNPNew.UseVisualStyleBackColor = true;
             // 
-            // RefreshList
+            // SNPRefresh
             // 
-            this.RefreshList.Font = new System.Drawing.Font("Microsoft JhengHei", 8.25F);
-            this.RefreshList.Location = new System.Drawing.Point(856, 12);
-            this.RefreshList.Name = "RefreshList";
-            this.RefreshList.Size = new System.Drawing.Size(54, 20);
-            this.RefreshList.TabIndex = 3;
-            this.RefreshList.Text = "Refresh";
-            this.RefreshList.UseVisualStyleBackColor = true;
+            this.SNPRefresh.Font = new System.Drawing.Font("Microsoft JhengHei", 8.25F);
+            this.SNPRefresh.Location = new System.Drawing.Point(837, 22);
+            this.SNPRefresh.Name = "SNPRefresh";
+            this.SNPRefresh.Size = new System.Drawing.Size(54, 20);
+            this.SNPRefresh.TabIndex = 3;
+            this.SNPRefresh.Text = "Refresh";
+            this.SNPRefresh.UseVisualStyleBackColor = true;
             // 
-            // Delete
+            // SNPDelete
             // 
-            this.Delete.Enabled = false;
-            this.Delete.Location = new System.Drawing.Point(643, 564);
-            this.Delete.Name = "Delete";
-            this.Delete.Size = new System.Drawing.Size(85, 28);
-            this.Delete.TabIndex = 4;
-            this.Delete.Text = "Delete";
-            this.Delete.UseVisualStyleBackColor = true;
+            this.SNPDelete.Enabled = false;
+            this.SNPDelete.Location = new System.Drawing.Point(624, 340);
+            this.SNPDelete.Name = "SNPDelete";
+            this.SNPDelete.Size = new System.Drawing.Size(85, 28);
+            this.SNPDelete.TabIndex = 4;
+            this.SNPDelete.Text = "Delete";
+            this.SNPDelete.UseVisualStyleBackColor = true;
             // 
-            // Edit
+            // SNPEdit
             // 
-            this.Edit.Enabled = false;
-            this.Edit.Location = new System.Drawing.Point(734, 564);
-            this.Edit.Name = "Edit";
-            this.Edit.Size = new System.Drawing.Size(85, 28);
-            this.Edit.TabIndex = 5;
-            this.Edit.Text = "Edit";
-            this.Edit.UseVisualStyleBackColor = true;
+            this.SNPEdit.Enabled = false;
+            this.SNPEdit.Location = new System.Drawing.Point(715, 340);
+            this.SNPEdit.Name = "SNPEdit";
+            this.SNPEdit.Size = new System.Drawing.Size(85, 28);
+            this.SNPEdit.TabIndex = 5;
+            this.SNPEdit.Text = "Edit";
+            this.SNPEdit.UseVisualStyleBackColor = true;
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.NewDT);
-            this.groupBox1.Controls.Add(this.DatatableList);
-            this.groupBox1.Controls.Add(this.SelectDT);
-            this.groupBox1.Controls.Add(this.LoadDT);
-            this.groupBox1.Location = new System.Drawing.Point(13, 599);
+            this.groupBox1.Controls.Add(this.DSUnload);
+            this.groupBox1.Controls.Add(this.DSRemove);
+            this.groupBox1.Controls.Add(this.DSEdit);
+            this.groupBox1.Controls.Add(this.DSListRefresh);
+            this.groupBox1.Controls.Add(this.DSNew);
+            this.groupBox1.Controls.Add(this.DSList);
+            this.groupBox1.Controls.Add(this.DSLoad);
+            this.groupBox1.Location = new System.Drawing.Point(13, 392);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(897, 175);
+            this.groupBox1.Size = new System.Drawing.Size(897, 321);
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Source for auto insert";
+            this.groupBox1.Text = "Snippet Auto Source";
             // 
-            // LoadDT
+            // DSRemove
             // 
-            this.LoadDT.Enabled = false;
-            this.LoadDT.Location = new System.Drawing.Point(806, 136);
-            this.LoadDT.Name = "LoadDT";
-            this.LoadDT.Size = new System.Drawing.Size(85, 33);
-            this.LoadDT.TabIndex = 7;
-            this.LoadDT.Text = "Load";
-            this.LoadDT.UseVisualStyleBackColor = true;
+            this.DSRemove.Enabled = false;
+            this.DSRemove.Location = new System.Drawing.Point(533, 288);
+            this.DSRemove.Name = "DSRemove";
+            this.DSRemove.Size = new System.Drawing.Size(85, 28);
+            this.DSRemove.TabIndex = 6;
+            this.DSRemove.Text = "Remove";
+            this.DSRemove.UseVisualStyleBackColor = true;
             // 
-            // SelectDT
+            // DSEdit
             // 
-            this.SelectDT.Location = new System.Drawing.Point(806, 61);
-            this.SelectDT.Name = "SelectDT";
-            this.SelectDT.Size = new System.Drawing.Size(85, 33);
-            this.SelectDT.TabIndex = 8;
-            this.SelectDT.Text = "Select";
-            this.SelectDT.UseVisualStyleBackColor = true;
+            this.DSEdit.Enabled = false;
+            this.DSEdit.Location = new System.Drawing.Point(624, 288);
+            this.DSEdit.Name = "DSEdit";
+            this.DSEdit.Size = new System.Drawing.Size(85, 28);
+            this.DSEdit.TabIndex = 10;
+            this.DSEdit.Text = "Edit";
+            this.DSEdit.UseVisualStyleBackColor = true;
             // 
-            // DatatableList
+            // DSListRefresh
             // 
-            this.DatatableList.Activation = System.Windows.Forms.ItemActivation.TwoClick;
-            this.DatatableList.AllowColumnReorder = true;
-            this.DatatableList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.DSListRefresh.Font = new System.Drawing.Font("Microsoft JhengHei", 8.25F);
+            this.DSListRefresh.Location = new System.Drawing.Point(837, 22);
+            this.DSListRefresh.Name = "DSListRefresh";
+            this.DSListRefresh.Size = new System.Drawing.Size(54, 20);
+            this.DSListRefresh.TabIndex = 6;
+            this.DSListRefresh.Text = "Refresh";
+            this.DSListRefresh.UseVisualStyleBackColor = true;
+            // 
+            // DSNew
+            // 
+            this.DSNew.Location = new System.Drawing.Point(6, 288);
+            this.DSNew.Name = "DSNew";
+            this.DSNew.Size = new System.Drawing.Size(100, 28);
+            this.DSNew.TabIndex = 9;
+            this.DSNew.Text = "New DataSet";
+            this.DSNew.UseVisualStyleBackColor = true;
+            // 
+            // DSList
+            // 
+            this.DSList.Activation = System.Windows.Forms.ItemActivation.TwoClick;
+            this.DSList.AllowColumnReorder = true;
+            this.DSList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.Empty0,
-            this.DataSet,
-            this.DataSource});
-            this.DatatableList.FullRowSelect = true;
-            this.DatatableList.GridLines = true;
-            this.DatatableList.HideSelection = false;
-            this.DatatableList.ImeMode = System.Windows.Forms.ImeMode.Off;
-            this.DatatableList.Location = new System.Drawing.Point(6, 22);
-            this.DatatableList.MultiSelect = false;
-            this.DatatableList.Name = "DatatableList";
-            this.DatatableList.ShowItemToolTips = true;
-            this.DatatableList.Size = new System.Drawing.Size(794, 147);
-            this.DatatableList.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            this.DatatableList.TabIndex = 7;
-            this.DatatableList.UseCompatibleStateImageBehavior = false;
-            this.DatatableList.View = System.Windows.Forms.View.Details;
-            // 
-            // DataSet
-            // 
-            this.DataSet.Text = "Data Set";
-            this.DataSet.Width = 250;
-            // 
-            // DataSource
-            // 
-            this.DataSource.Text = "DataSource";
-            this.DataSource.Width = 250;
-            // 
-            // NewDT
-            // 
-            this.NewDT.Location = new System.Drawing.Point(806, 22);
-            this.NewDT.Name = "NewDT";
-            this.NewDT.Size = new System.Drawing.Size(85, 33);
-            this.NewDT.TabIndex = 9;
-            this.NewDT.Text = "New";
-            this.NewDT.UseVisualStyleBackColor = true;
+            this.DataSetName,
+            this.DataTableList,
+            this.DataSetLoaded,
+            this.DataSetGUID});
+            this.DSList.FullRowSelect = true;
+            this.DSList.GridLines = true;
+            this.DSList.HideSelection = false;
+            this.DSList.ImeMode = System.Windows.Forms.ImeMode.Off;
+            this.DSList.Location = new System.Drawing.Point(6, 48);
+            this.DSList.Name = "DSList";
+            this.DSList.ShowItemToolTips = true;
+            this.DSList.Size = new System.Drawing.Size(885, 234);
+            this.DSList.Sorting = System.Windows.Forms.SortOrder.Ascending;
+            this.DSList.TabIndex = 7;
+            this.DSList.UseCompatibleStateImageBehavior = false;
+            this.DSList.View = System.Windows.Forms.View.Details;
             // 
             // Empty0
             // 
             this.Empty0.Text = "Empty";
             this.Empty0.Width = 0;
             // 
+            // DataSetName
+            // 
+            this.DataSetName.Text = "DataSet Name";
+            this.DataSetName.Width = 145;
+            // 
+            // DataTableList
+            // 
+            this.DataTableList.Text = "DataTable List";
+            this.DataTableList.Width = 325;
+            // 
+            // DataSetLoaded
+            // 
+            this.DataSetLoaded.Text = "DataSet Loaded";
+            this.DataSetLoaded.Width = 105;
+            // 
+            // DataSetGUID
+            // 
+            this.DataSetGUID.Text = "DataSet GUID";
+            this.DataSetGUID.Width = 270;
+            // 
+            // DSLoad
+            // 
+            this.DSLoad.Enabled = false;
+            this.DSLoad.Location = new System.Drawing.Point(806, 288);
+            this.DSLoad.Name = "DSLoad";
+            this.DSLoad.Size = new System.Drawing.Size(85, 28);
+            this.DSLoad.TabIndex = 7;
+            this.DSLoad.Text = "Load";
+            this.DSLoad.UseVisualStyleBackColor = true;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.SNPRefresh);
+            this.groupBox2.Controls.Add(this.SNPList);
+            this.groupBox2.Controls.Add(this.SNPEdit);
+            this.groupBox2.Controls.Add(this.SNPOpen);
+            this.groupBox2.Controls.Add(this.SNPDelete);
+            this.groupBox2.Controls.Add(this.SNPNew);
+            this.groupBox2.Location = new System.Drawing.Point(13, 12);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(897, 374);
+            this.groupBox2.TabIndex = 7;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Snippets";
+            // 
+            // DSListMenu
+            // 
+            this.DSListMenu.Name = "DSListMenu";
+            this.DSListMenu.Size = new System.Drawing.Size(61, 4);
+            // 
+            // DSUnload
+            // 
+            this.DSUnload.Enabled = false;
+            this.DSUnload.Location = new System.Drawing.Point(715, 288);
+            this.DSUnload.Name = "DSUnload";
+            this.DSUnload.Size = new System.Drawing.Size(85, 28);
+            this.DSUnload.TabIndex = 11;
+            this.DSUnload.Text = "Unload";
+            this.DSUnload.UseVisualStyleBackColor = true;
+            // 
             // Home
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(922, 786);
+            this.ClientSize = new System.Drawing.Size(922, 722);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.Edit);
-            this.Controls.Add(this.Delete);
-            this.Controls.Add(this.RefreshList);
-            this.Controls.Add(this.New);
-            this.Controls.Add(this.Open);
-            this.Controls.Add(this.SnippetList);
             this.Font = new System.Drawing.Font("Microsoft JhengHei", 9F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -252,32 +321,40 @@
             this.Name = "Home";
             this.Text = "Home";
             this.groupBox1.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.ListView SnippetList;
+        private System.Windows.Forms.ListView SNPList;
         private System.Windows.Forms.ColumnHeader SnippetName;
         private System.Windows.Forms.ColumnHeader CreatedDate;
         private System.Windows.Forms.ColumnHeader LastUsedDate;
-        private System.Windows.Forms.ColumnHeader Notes;
-        private System.Windows.Forms.Button Open;
-        private System.Windows.Forms.Button New;
+        private System.Windows.Forms.ColumnHeader Remark;
+        private System.Windows.Forms.Button SNPOpen;
+        private System.Windows.Forms.Button SNPNew;
         private System.Windows.Forms.ColumnHeader Empty;
-        private System.Windows.Forms.Button RefreshList;
-        private System.Windows.Forms.Button Delete;
-        private System.Windows.Forms.Button Edit;
-        private System.Windows.Forms.ColumnHeader FolderKey;
+        private System.Windows.Forms.Button SNPRefresh;
+        private System.Windows.Forms.Button SNPDelete;
+        private System.Windows.Forms.Button SNPEdit;
+        private System.Windows.Forms.ColumnHeader SnippetGUID;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.Button NewDT;
-        private System.Windows.Forms.ListView DatatableList;
-        private System.Windows.Forms.ColumnHeader DataSet;
-        private System.Windows.Forms.ColumnHeader DataSource;
-        private System.Windows.Forms.Button SelectDT;
-        private System.Windows.Forms.Button LoadDT;
+        private System.Windows.Forms.Button DSNew;
+        private System.Windows.Forms.ListView DSList;
+        private System.Windows.Forms.ColumnHeader DataSetName;
+        private System.Windows.Forms.ColumnHeader DataTableList;
+        private System.Windows.Forms.Button DSLoad;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Button DSListRefresh;
+        private System.Windows.Forms.ColumnHeader DataSetLoaded;
+        private System.Windows.Forms.Button DSEdit;
+        private System.Windows.Forms.Button DSRemove;
+        private System.Windows.Forms.ColumnHeader DataSetGUID;
         private System.Windows.Forms.ColumnHeader Empty0;
+        private System.Windows.Forms.ContextMenuStrip DSListMenu;
+        private System.Windows.Forms.Button DSUnload;
     }
 }
 

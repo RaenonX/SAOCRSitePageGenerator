@@ -28,29 +28,30 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.DatatableList = new System.Windows.Forms.ListView();
+            this.ItemList = new System.Windows.Forms.ListView();
             this.Empty = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.Select = new System.Windows.Forms.Button();
+            this.Submit = new System.Windows.Forms.Button();
+            this.Tips = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // DatatableList
+            // ItemList
             // 
-            this.DatatableList.Activation = System.Windows.Forms.ItemActivation.TwoClick;
-            this.DatatableList.AllowColumnReorder = true;
-            this.DatatableList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.ItemList.Activation = System.Windows.Forms.ItemActivation.TwoClick;
+            this.ItemList.AllowColumnReorder = true;
+            this.ItemList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.Empty});
-            this.DatatableList.FullRowSelect = true;
-            this.DatatableList.GridLines = true;
-            this.DatatableList.HideSelection = false;
-            this.DatatableList.ImeMode = System.Windows.Forms.ImeMode.Off;
-            this.DatatableList.Location = new System.Drawing.Point(12, 12);
-            this.DatatableList.Name = "DatatableList";
-            this.DatatableList.ShowItemToolTips = true;
-            this.DatatableList.Size = new System.Drawing.Size(1018, 549);
-            this.DatatableList.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            this.DatatableList.TabIndex = 8;
-            this.DatatableList.UseCompatibleStateImageBehavior = false;
-            this.DatatableList.View = System.Windows.Forms.View.Details;
+            this.ItemList.FullRowSelect = true;
+            this.ItemList.GridLines = true;
+            this.ItemList.HideSelection = false;
+            this.ItemList.ImeMode = System.Windows.Forms.ImeMode.Off;
+            this.ItemList.Location = new System.Drawing.Point(12, 12);
+            this.ItemList.Name = "ItemList";
+            this.ItemList.ShowItemToolTips = true;
+            this.ItemList.Size = new System.Drawing.Size(1018, 549);
+            this.ItemList.Sorting = System.Windows.Forms.SortOrder.Ascending;
+            this.ItemList.TabIndex = 8;
+            this.ItemList.UseCompatibleStateImageBehavior = false;
+            this.ItemList.View = System.Windows.Forms.View.Details;
             // 
             // Empty
             // 
@@ -59,20 +60,31 @@
             // 
             // Select
             // 
-            this.Select.Location = new System.Drawing.Point(945, 567);
-            this.Select.Name = "Select";
-            this.Select.Size = new System.Drawing.Size(85, 32);
-            this.Select.TabIndex = 9;
-            this.Select.Text = "Select";
-            this.Select.UseVisualStyleBackColor = true;
+            this.Submit.Enabled = false;
+            this.Submit.Location = new System.Drawing.Point(945, 567);
+            this.Submit.Name = "Select";
+            this.Submit.Size = new System.Drawing.Size(85, 32);
+            this.Submit.TabIndex = 9;
+            this.Submit.Text = "Select";
+            this.Submit.UseVisualStyleBackColor = true;
+            // 
+            // Tips
+            // 
+            this.Tips.Location = new System.Drawing.Point(12, 567);
+            this.Tips.Margin = new System.Windows.Forms.Padding(3);
+            this.Tips.Name = "Tips";
+            this.Tips.Size = new System.Drawing.Size(927, 32);
+            this.Tips.TabIndex = 10;
+            this.Tips.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // ListviewSelector
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1042, 608);
-            this.Controls.Add(this.Select);
-            this.Controls.Add(this.DatatableList);
+            this.Controls.Add(this.Tips);
+            this.Controls.Add(this.Submit);
+            this.Controls.Add(this.ItemList);
             this.Font = new System.Drawing.Font("Microsoft JhengHei", 9F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -85,8 +97,9 @@
 
         #endregion
 
-        private System.Windows.Forms.ListView DatatableList;
+        private System.Windows.Forms.ListView ItemList;
         private System.Windows.Forms.ColumnHeader Empty;
-        private System.Windows.Forms.Button Select;
+        private System.Windows.Forms.Button Submit;
+        private System.Windows.Forms.Label Tips;
     }
 }

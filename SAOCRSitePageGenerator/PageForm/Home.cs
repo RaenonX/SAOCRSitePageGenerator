@@ -25,78 +25,101 @@ namespace SAOCRSitePageGenerator
         {
             RefreshSnippetList();
             CheckSourceDirectory();
+            RefreshDSList();
         }
         
         private void InitializeEventHandler()
         {
-            SnippetList.ItemSelectionChanged += SnippetList_ItemSelectionChanged;
-            SnippetList.KeyDown += SnippetList_KeyDown;
-            SnippetList.MouseDoubleClick += Open_Click;
-            DatatableList.KeyDown += DatatableList_KeyDown;
-            RefreshList.Click += Refresh_Click;
-            Open.Click += Open_Click;
-            Delete.Click += Delete_Click;
-            Edit.Click += Edit_Click;
-            New.Click += New_Click;
+            SNPList.ItemSelectionChanged += SNPList_ItemSelectionChanged;
+            SNPList.KeyDown += SNPList_KeyDown;
+            SNPList.MouseDoubleClick += SNPOpen_Click;
+            SNPRefresh.Click += SNPRefresh_Click;
+            SNPOpen.Click += SNPOpen_Click;
+            SNPDelete.Click += SNPDelete_Click;
+            SNPEdit.Click += SNPEdit_Click;
+            SNPNew.Click += SNPNew_Click;
+
+            DSList.KeyDown += DSList_KeyDown;
+            DSList.ItemSelectionChanged += DSList_ItemSelectionChanged;
+            DSList.MouseDoubleClick += DSList_MouseDoubleClick;
+            DSListRefresh.Click += DSListRefresh_Click;
+            DSNew.Click += DSNew_Click;
+            DSEdit.Click += DSEdit_Click;
+            DSRemove.Click += DSRemove_Click;
+            DSLoad.Click += DSLoad_Click;
+            DSUnload.Click += DSUnload_Click;
         }
         #endregion
 
         #region Events
-        private void SnippetList_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+
+        #region Snippet Processing
+        private void SNPList_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
-            SetSnippetControlButtonsEnabled(SnippetList.SelectedItems.Count > 0);
+            SetSnippetControlButtonsEnabled(SNPList.SelectedItems.Count > 0);
         }
 
-        private void Open_Click(object sender, EventArgs e)
+        private void SNPOpen_Click(object sender, EventArgs e)
         {
-            string SNPName = SnippetList.SelectedItems[0].SubItems[ReadOnly.SnippetName].Text;
-            string SNPKey = SnippetList.SelectedItems[0].SubItems[ReadOnly.SnippetFolderKey].Text;
+            string SNPName = SNPList.SelectedItems[0].SubItems[ReadOnly.SnippetName].Text;
+            string SNPKey = SNPList.SelectedItems[0].SubItems[ReadOnly.SnippetGUID].Text;
 
             KeyValuePair<string, string> SnippetInfo = new KeyValuePair<string, string>(SNPKey, SNPName);
 
-            ExecuteSnippet(SnippetInfo);
+            if (ExecuteSnippet(SnippetInfo) == DialogResult.OK)
+            {
+                using (ConfigManager CMS = new ConfigManager(ReadOnly.SnippetsPath + "/" + SnippetInfo.Key + "/" + ReadOnly.SnippetStructConfig))
+                {
+                    CMS.SetConfig(ReadOnly.SnippetLastUsed, DateTime.Now.ToString("yyyy/MM/dd tt HH:mm"));
+                    CMS.SaveAsync();
+                }
+            }
+            RefreshSnippetList();
+
+            SetSnippetControlButtonsEnabled(SNPList.SelectedItems.Count > 0);
         }
 
-        private void Edit_Click(object sender, EventArgs e)
+        private void SNPEdit_Click(object sender, EventArgs e)
         {
-            string SNPPath = ReadOnly.SnippetsPath + "/" + SnippetList.SelectedItems[0].SubItems[ReadOnly.SnippetFolderKey].Text;
+            string SNPPath = ReadOnly.SnippetsPath + "/" + SNPList.SelectedItems[0].SubItems[ReadOnly.SnippetGUID].Text;
+            
+            if (EditSnippet(SNPPath) == DialogResult.OK)
+            {
+                RefreshSnippetList();
+            }
 
-            EditSnippet(SNPPath);
+            SetSnippetControlButtonsEnabled(SNPList.SelectedItems.Count > 0);
         }
 
-        private void Delete_Click(object sender, EventArgs e)
+        private void SNPDelete_Click(object sender, EventArgs e)
         {
-            string SNPKey = SnippetList.SelectedItems[0].SubItems[ReadOnly.SnippetFolderKey].Text;
+            string SNPKey = SNPList.SelectedItems[0].SubItems[ReadOnly.SnippetGUID].Text;
 
             if (MessageBox.Show("Are you sure want to delete the snippet?\n\nSnippet Name: " + SNPKey, "Snippet deleting confirmation", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 DeleteSnippet(SNPKey);
             }
             RefreshSnippetList();
+
+            SetSnippetControlButtonsEnabled(SNPList.SelectedItems.Count > 0);
         }
 
-        private void New_Click(object sender, EventArgs e)
+        private void SNPNew_Click(object sender, EventArgs e)
         {
             if (CreateNewSnippet() == DialogResult.OK)
             {
                 RefreshSnippetList();
             }
+
+            SetSnippetControlButtonsEnabled(SNPList.SelectedItems.Count > 0);
         }
 
-        private void Refresh_Click(object sender, EventArgs e)
+        private void SNPRefresh_Click(object sender, EventArgs e)
         {
             RefreshSnippetList();
         }
 
-        private void SnippetList_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyData == Keys.F5)
-            {
-                RefreshSnippetList();
-            }
-        }
-        
-        private void DatatableList_KeyDown(object sender, KeyEventArgs e)
+        private void SNPList_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyData == Keys.F5)
             {
@@ -105,75 +128,120 @@ namespace SAOCRSitePageGenerator
         }
         #endregion
 
+        #region External Source Processing
+        private void DSNew_Click(object sender, EventArgs e)
+        {
+            if (CreateNewDataSet() == DialogResult.OK)
+            {
+                RefreshDSList();
+            }
+        }
+
+        private void DSEdit_Click(object sender, EventArgs e)
+        {
+            if (EditDataSet(new Guid(DSList.SelectedItems[0].SubItems[ReadOnly.SourceDataSetGUID].Text)) == DialogResult.OK)
+            {
+                RefreshDSList();
+            }
+        }
+
+        private void DSRemove_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure want to remove the selected DataSet?", "DataSet Deletion Confirmation", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                foreach (ListViewItem DSVIewItem in DSList.SelectedItems)
+                {
+                    Guid DSGuid = new Guid(DSVIewItem.SubItems[ReadOnly.SourceDataSetGUID].Text);
+                    string DSName = DSVIewItem.SubItems[ReadOnly.SourceDataSetName].Text;
+
+                    RemoveDS(DSGuid);
+                }
+
+                RefreshDSList();
+            }
+        }
+
+        private void DSListRefresh_Click(object sender, EventArgs e)
+        {
+            RefreshDSList();
+        }
+
+        private void DSList_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyData == Keys.F5)
+            {
+                RefreshDSList();
+            }
+        }
+
+        private void DSList_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        {
+            SetDataSetControlButtonEnabled(DSList.SelectedItems.Count > 0);
+        }
+
+        private void DSLoad_Click(object sender, EventArgs e)
+        {
+            LoadDataSet();
+        }
+
+        private void DSList_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            LoadDataSet();
+        }
+
+        private void DSUnload_Click(object sender, EventArgs e)
+        {
+            unLoadDataSet();
+        }
+        #endregion
+
+        #endregion
+
         #region Methods
+
+        #region Snippet Processing
         private void SetSnippetControlButtonsEnabled(bool Enabled)
         {
-            Edit.Enabled = Delete.Enabled = Open.Enabled = Enabled;
+            SNPEdit.Enabled = SNPDelete.Enabled = SNPOpen.Enabled = Enabled;
         }
 
         private void RefreshSnippetList()
         {
-            SnippetList.Items.Clear();
+            SNPList.Items.Clear();
 
             if (!Directory.Exists(ReadOnly.SnippetsPath))
             {
                 Directory.CreateDirectory(ReadOnly.SnippetsPath);
             }
 
-            using (ConfigManager CM = new ConfigManager(ReadOnly.SnippetsPath + "/" + ReadOnly.SnippetsList))
+            using (ConfigManager CM = new ConfigManager(ReadOnly.SnippetsListPath))
             {
-                foreach (KeyValuePair<string, string> Config in CM.GetConfigAll())
+                foreach (KeyValuePair<string, string> SnippetInfo in CM.GetConfigAll())
                 {
-                    string SnippetFolderPath = ReadOnly.SnippetsPath + "/" + Config.Key;
+                    string SnippetFolderPath = ReadOnly.SnippetsPath + "/" + SnippetInfo.Key;
                     bool isSingle = true, isRepeatedSnippet = true;
 
-                    foreach (string FileName in ReadOnly.SnippetStructSingle)
-                    {
-                        if (!File.Exists(SnippetFolderPath + "/" + FileName))
-                        {
-                            isSingle = false;
-                            break;
-                        }
-                    }
-
-                    foreach (string FileName in ReadOnly.SnippetStructMulti)
-                    {
-                        if (FileName == ReadOnly.SnippetStructSnippetLoop)
-                        {
-                            isRepeatedSnippet = Directory.GetFiles(SnippetFolderPath, "*" + ReadOnly.SnippetStructSnippetLoop + "*").Length > 0;
-                        }
-                        else
-                        {
-                            if (!File.Exists(SnippetFolderPath + "/" + FileName))
-                            {
-                                isRepeatedSnippet = false;
-                                break;
-                            }
-                        }
-                    }
+                    isSingle = ScanIsSingleSnippet(SnippetFolderPath);
+                    isRepeatedSnippet = ScanIsRepeatedSnippet(SnippetFolderPath);
 
                     if (isSingle || isRepeatedSnippet)
                     {
                         using (ConfigManager CMS = new ConfigManager(SnippetFolderPath + "/" + ReadOnly.SnippetStructConfig))
                         {
-                            ListViewItem LVI = new ListViewItem();
-                            foreach (ColumnHeader CH in SnippetList.Columns)
-                            {
-                                ListViewItem.ListViewSubItem SUB = new ListViewItem.ListViewSubItem();
-                                SUB.Name = CH.Text;
-                                LVI.SubItems.Add(SUB);
-                            }
+                            ListViewItem LVI = CreateListViewItemFitToListView(SNPList);
                             LVI.SubItems.RemoveByKey("Empty");
+
                             foreach (string Keys in ReadOnly.SnippetsListKeys)
                             {
                                 LVI.SubItems[Keys].Text = CMS.GetConfig(Keys);
                             }
-                            SnippetList.Items.Add(LVI);
+
+                            SNPList.Items.Add(LVI);
                         }
                     }
                     else
                     {
-                        if (MessageBox.Show("Snippet folder file struct illegal. Delete folder?\n\nFolder Path: " + SnippetFolderPath + "\nFolder Name: " + Config.Value, "Illegal Snippet Folder", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                        if (MessageBox.Show("Snippet folder file struct illegal. Delete folder?\n\nFolder Path: " + SnippetFolderPath + "\nFolder Name: " + SnippetInfo.Value, "Illegal Snippet Folder", MessageBoxButtons.YesNo) == DialogResult.Yes)
                         {
                             Directory.Delete(SnippetFolderPath, true);
                             CM.RemoveConfig(SnippetFolderPath);
@@ -183,20 +251,50 @@ namespace SAOCRSitePageGenerator
             }
         }
 
+        private bool ScanIsSingleSnippet(string folder)
+        {
+            bool isLegalSnippet = true;
+            foreach (string FileName in ReadOnly.SnippetStructSingle)
+            {
+                if (!File.Exists(folder + "/" + FileName))
+                {
+                    isLegalSnippet = false;
+                    break;
+                }
+            }
+            return isLegalSnippet;
+        }
+
+        private bool ScanIsRepeatedSnippet(string Folder)
+        {
+            bool isLegalSnippet = true;
+            foreach (string FileName in ReadOnly.SnippetStructMulti)
+            {
+                if (FileName == ReadOnly.SnippetStructSnippetLoop)
+                {
+                    isLegalSnippet = Directory.GetFiles(Folder, "*" + ReadOnly.SnippetStructSnippetLoop + "*").Length > 0;
+                }
+                else
+                {
+                    if (!File.Exists(Folder + "/" + FileName))
+                    {
+                        isLegalSnippet = false;
+                        break;
+                    }
+                }
+            }
+            return isLegalSnippet;
+        }
+
         private void CheckSourceDirectory()
         {
             if (!Directory.Exists(ReadOnly.SourcePath))
                 Directory.CreateDirectory(ReadOnly.SourcePath);
-
-            foreach (string Path in ReadOnly.SourceDataFolders)
-            {
-                Directory.CreateDirectory(Path);
-            }
         }
 
         private void DeleteSnippet(string SnippetKey)
         {
-            using (ConfigManager CM = new ConfigManager(ReadOnly.SnippetsPath + "/" + ReadOnly.SnippetsList))
+            using (ConfigManager CM = new ConfigManager(ReadOnly.SnippetsListPath))
             {
                 if (!string.IsNullOrEmpty(SnippetKey))
                 {
@@ -208,20 +306,160 @@ namespace SAOCRSitePageGenerator
 
         private DialogResult ExecuteSnippet(KeyValuePair<string, string> SnippetInfo)
         {
-            SnippetGenerator SG = new SnippetGenerator(SnippetInfo);
-            return SG.ShowDialog();
+            using (LoadingBlock LB = new LoadingBlock())
+            {
+                LB.StartPosition = FormStartPosition.CenterScreen;
+
+                LB.Show(this);
+                Application.DoEvents();
+
+                SnippetExecutor SG = new SnippetExecutor(SnippetInfo);
+                
+                LB.Close();
+                Application.DoEvents();
+
+                return SG.ShowDialog(this);
+            }
         }
 
         private DialogResult CreateNewSnippet()
         {
-            NewSnippetInitializer NSI = new NewSnippetInitializer();
+            SnippetEditor NSI = new SnippetEditor();
             return NSI.ShowDialog();
         }
 
         private DialogResult EditSnippet(string SnippetPath)
         {
-            NewSnippetInitializer NSI = new NewSnippetInitializer(SnippetPath);
+            SnippetEditor NSI = new SnippetEditor(SnippetPath);
             return NSI.ShowDialog();
+        }
+        #endregion
+
+        #region External Source Processing
+        private void SetDataSetControlButtonEnabled(bool Enabled)
+        {
+            DSEdit.Enabled = Enabled;
+            DSLoad.Enabled = Enabled;
+            DSRemove.Enabled = Enabled;
+            DSUnload.Enabled = Enabled;
+        }
+
+        private void RefreshDSList()
+        {
+            DSList.Items.Clear();
+            using (ConfigManager CM = new ConfigManager(ReadOnly.SourceDataSetDict))
+            {
+                foreach (KeyValuePair<string, string> Pair in CM.GetConfigAll())
+                {
+                    using (DataSet DS = ReadDataSetXML(ReadOnly.SourcePath + "/" + Pair.Key))
+                    {
+                        ListViewItem LVI = CreateListViewItemFitToListView(DSList);
+                        LVI.SubItems.RemoveByKey("Empty");
+                        LVI.SubItems[ReadOnly.SourceDataTableList].Text = GetDTListString(DS);
+                        LVI.SubItems[ReadOnly.SourceDataSetName].Text = string.IsNullOrEmpty(Pair.Value) ? "(No Name)" : Pair.Value;
+                        LVI.SubItems[ReadOnly.SourceDataSetLoaded].Text = Static.SnippetExternalSource.ContainsKey(new Guid(Pair.Key)).ToString();
+                        LVI.SubItems[ReadOnly.SourceDataSetGUID].Text = Pair.Key;
+
+                        DSList.Items.Add(LVI);
+                    }
+                }
+            }
+
+            SetDataSetControlButtonEnabled(DSList.SelectedItems.Count > 0);
+        }
+
+        private string GetDTListString(DataSet DS)
+        {
+            string ListString = "";
+
+            foreach (DataRow DR in DS.Tables[ReadOnly.SourceDataTableInfoTable].Rows)
+            {
+                ListString += DR[ReadOnly.SourceDataTableName] + ", ";
+            }
+
+            ListString = ListString.Length > 2 ? ListString.Substring(0, ListString.Length - 2) : string.Empty;
+            return ListString;
+        }
+
+        private DataSet ReadDataSetXML(string Path)
+        {
+            DataSet DS = new DataSet();
+            DS.ReadXml(Path);
+            return DS;
+        }
+
+        private void RemoveDS(Guid DSGuid)
+        {
+            if (Static.SnippetExternalSource.ContainsKey(DSGuid))
+            {
+                Static.SnippetExternalSource.Remove(DSGuid);
+            }
+            using (ConfigManager CM = new ConfigManager(ReadOnly.SourceDataSetDict))
+            {
+                CM.RemoveConfig(DSGuid.ToString());
+                CM.Save();
+            }
+            File.Delete(ReadOnly.SourcePath + "/" + DSGuid.ToString());
+            File.Delete(ReadOnly.SourcePath + "/" + DSGuid.ToString() + ReadOnly.SourceMemoExtension);
+        }
+
+        private DialogResult CreateNewDataSet()
+        {
+            DataSetEditor DTE = new DataSetEditor();
+            return DTE.ShowDialog();
+        }
+
+        private DialogResult EditDataSet(Guid DSGuid)
+        {
+            DataSetEditor DTE = new DataSetEditor(DSGuid);
+            return DTE.ShowDialog();
+        }
+
+        private void LoadDataSet()
+        {
+            foreach (ListViewItem LVI in DSList.SelectedItems)
+            {
+                Guid DSGuid = new Guid(LVI.SubItems[ReadOnly.SourceDataSetGUID].Text);
+                DataSet DSToAdd = ReadDataSetXML(ReadOnly.SourcePath + "/" + LVI.SubItems[ReadOnly.SourceDataSetGUID].Text);
+                if (!Static.SnippetExternalSource.ContainsKey(DSGuid))
+                {
+                    Static.SnippetExternalSource.Add(DSGuid, DSToAdd);
+                }
+            }
+            RefreshDSList();
+        }
+
+        private void unLoadDataSet()
+        {
+            foreach (ListViewItem LVI in DSList.SelectedItems)
+            {
+                Guid DSGuid = new Guid(LVI.SubItems[ReadOnly.SourceDataSetGUID].Text);
+                if (Static.SnippetExternalSource.ContainsKey(DSGuid))
+                {
+                    Static.SnippetExternalSource.Remove(DSGuid);
+                }
+            }
+            RefreshDSList();
+        }
+
+        private DataSet GetDataSetByGuid(Dictionary<Guid, DataSet> Dict, Guid Guid)
+        {
+            DataSet DSRet = null;
+            Dict.TryGetValue(Guid, out DSRet);
+            return DSRet;
+        }
+        #endregion
+
+        private ListViewItem CreateListViewItemFitToListView(ListView LV)
+        {
+            ListViewItem LVI = new ListViewItem();
+            foreach (ColumnHeader CH in LV.Columns)
+            {
+                ListViewItem.ListViewSubItem SUB = new ListViewItem.ListViewSubItem();
+                SUB.Name = CH.Text;
+                LVI.SubItems.Add(SUB);
+            }
+            return LVI;
         }
         #endregion
     }

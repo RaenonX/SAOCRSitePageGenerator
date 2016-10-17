@@ -14,7 +14,6 @@ namespace SAOCRSitePageGenerator
     {
         string mConfigPath;
         Dictionary<string, string> mConfigs = new Dictionary<string, string>();
-        StreamReader SR;
 
         public ConfigManager(string ConfigPath)
         {
@@ -22,15 +21,13 @@ namespace SAOCRSitePageGenerator
 
             if (!File.Exists(mConfigPath))
                 using (FileStream FS = File.Create(mConfigPath)) { }
-
-            SR = new StreamReader(mConfigPath);
-
-            lock (SR)
+            
+            using (StreamReader SR = CreateReader(mConfigPath))
             {
                 while (!SR.EndOfStream)
                 {
                     string Raw = SR.ReadLine();
-                    string[] Data = Raw.Split('=');
+                    string[] Data = Raw.Split(new char[] { '=' }, 2);
                     if (Data.Length == 2) mConfigs.Add(Data[0], Data[1]);
                 }
                 SR.Close();
@@ -66,7 +63,7 @@ namespace SAOCRSitePageGenerator
             mConfigs.Remove(Key);
         }
 
-        public void SaveAsync()
+        public void SaveAsync(bool DisplaySaveFailed = false)
         {
             int SaveTryCounter = 0;
             
@@ -92,9 +89,31 @@ namespace SAOCRSitePageGenerator
             {
                 if (SaveTryCounter > 10)
                 {
-                    MessageBox.Show("Config file saving failed.\n\nPath: " + mConfigPath);
+                    MessageBox.Show("Config file saving failed. Saving progress will be continue after clicking 'OK'.\n\nPath: " + mConfigPath);
                 }
                 SaveAsync();
+            }
+        }
+
+        public void Save(bool DisplaySaveFailed = false)
+        {
+            try
+            {
+                using (StreamWriter SW = new StreamWriter(mConfigPath))
+                {
+                    SW.AutoFlush = true;
+                    SW.NewLine = "\n";
+
+                    foreach (KeyValuePair<string, string> Data in mConfigs) SW.WriteLine(Data.Key + "=" + Data.Value);
+                }
+            }
+            catch (IOException)
+            {
+                if (DisplaySaveFailed)
+                {
+                    MessageBox.Show("Config file saving failed. Saving progress will be continue after clicking 'OK'.\n\nPath: " + mConfigPath);
+                }
+                Save();
             }
         }
 
@@ -126,9 +145,22 @@ namespace SAOCRSitePageGenerator
             return DT;
         }
 
+        private StreamReader CreateReader(string Path)
+        {
+            StreamReader SR = null;
+            try
+            {
+                SR = new StreamReader(Path);
+            }
+            catch (IOException)
+            {
+                SR = CreateReader(Path);
+            }
+            return SR;
+        }
+
         public void Dispose()
         {
-            SR.Dispose();
         }
     }
 }

@@ -11,22 +11,22 @@ using System.Windows.Forms;
 
 namespace SAOCRSitePageGenerator
 {
-    public partial class NewSnippetInitializer : Form
+    public partial class SnippetEditor : Form, IFolderBrowseDialog
     {
         DataTable FieldList;
-        Guid FolderKey;
+        Guid SnippetKey;
         
         bool isEditMode;
         string[] SnippetCollection;
         int RepeatedSnippetCount = 1, CurrentPage = 0;
 
         #region Initialize
-        public NewSnippetInitializer()
+        public SnippetEditor()
         {
             CommonInitialize();
         }
 
-        public NewSnippetInitializer(string SnippetPath)
+        public SnippetEditor(string SnippetPath)
         {
             CommonInitialize();
             SetToEditMode(SnippetPath);
@@ -35,6 +35,7 @@ namespace SAOCRSitePageGenerator
         private void InitializeEventHandler()
         {
             Snippet.KeyDown += Snippet_KeyDown;
+            Snippet.KeyUp += Snippet_KeyUp;
             FieldListView.DataBindingComplete += FieldListView_DataBindingComplete;
             DestinationBrowse.Click += DestinationBrowse_Click;
             ScanFields.Click += ScanFields_Click;
@@ -49,7 +50,7 @@ namespace SAOCRSitePageGenerator
 
         private void Initialize()
         {
-            FolderKey = Guid.NewGuid();
+            SnippetKey = Guid.NewGuid();
         }
 
         private void CommonInitialize()
@@ -61,15 +62,18 @@ namespace SAOCRSitePageGenerator
         #endregion
 
         #region Events
+        private void Snippet_KeyUp(object sender, KeyEventArgs e)
+        {
+            SetCreateButtonEnabled(false);
+            SnippetCollection[CurrentPage] = Snippet.Text;
+        }
+
         private void Snippet_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.A && e.Modifiers == Keys.Control)
             {
                 Snippet.SelectAll();
             }
-
-            SetCreateButtonEnabled(false);
-            SnippetCollection[CurrentPage] = Snippet.Text;
         }
 
         private void SingleSnippet_CheckedChanged(object sender, EventArgs e)
@@ -121,7 +125,9 @@ namespace SAOCRSitePageGenerator
 
         private void ScanFields_Click(object sender, EventArgs e)
         {
-            FieldListView.DataSource = FieldList = GenerateFieldListDatatable(ParseFieldListFromSnippet(SnippetCollection));
+            List<string> FieldNameList = ParseFieldListFromSnippet(SnippetCollection);
+
+            FieldListView.DataSource = FieldList = FieldList == null ? GenerateFieldListDatatable(FieldNameList) : ModifyFieldListFromDatatable(FieldList, FieldNameList);
         }
         
         private void Create_Click(object sender, EventArgs e)
@@ -130,27 +136,27 @@ namespace SAOCRSitePageGenerator
             if (!isLegalDestination()) { MessageBox.Show("Illegal output destination."); return; }
             if (isSameBracket()) { MessageBox.Show("Field brackets at the left or right can not be same."); return; }
 
-            string SnippetDir = ReadOnly.SnippetsPath + "/" + FolderKey.ToString();
+            string SnippetDir = ReadOnly.SnippetsPath + "/" + SnippetKey.ToString();
             string SnippetConfig = SnippetDir + "/" + ReadOnly.SnippetStructConfig;
             string SnippetFieldList = SnippetDir + "/" + ReadOnly.SnippetStructFieldList;
 
-            SetProgress(0, "Checking snippet directory...");
+            SetProgress(0, "Checking snippet directory... (1/6)");
             if (!isEditMode) { SnippetDirectoryProcess(SnippetDir); }
-            SetProgress(25, "Writing snippet config file...");
+            SetProgress(22, "Writing snippet config file... (2/6)");
             WriteConfig(SnippetConfig);
-            SetProgress(50, "Writing snippet code...");
+            SetProgress(45, "Writing snippet code... (3/6)");
             WriteSnippet(SnippetDir);
-            SetProgress(75, "Writing snippet field list...");
+            SetProgress(67, "Writing snippet field list... (4/6)");
             WriteFieldList(SnippetFieldList);
-            SetProgress(95, "Updating snippet list file...");
-            using (ConfigManager CM = new ConfigManager(ReadOnly.SnippetsPath + "/" + ReadOnly.SnippetsList))
+            SetProgress(90, "Updating snippet list file... (5/6)");
+            using (ConfigManager CM = new ConfigManager(ReadOnly.SnippetsListPath))
             {
-                CM.SetConfig(FolderKey.ToString(), SnippetName.Text);
+                CM.SetConfig(SnippetKey.ToString(), SnippetName.Text);
                 CM.SaveAsync();
             }
-            SetProgress(100, "Snippet " + (isEditMode ? "Updating" : "Creation") + " completed.");
+            SetProgress(100, "Snippet " + (isEditMode ? "Updating" : "Creation") + " completed. (6/6)");
 
-            MessageBox.Show("Snippet " + (isEditMode ? "Updating" : "Creation") + " completed.\n\nSnippet Name: " + SnippetName.Text + "\nSnippet Key: " + FolderKey.ToString());
+            MessageBox.Show("Snippet " + (isEditMode ? "Updating" : "Creation") + " completed.\n\nSnippet Name: " + SnippetName.Text + "\nSnippet Key: " + SnippetKey.ToString());
             DialogResult = DialogResult.OK;
         }
 
@@ -191,23 +197,76 @@ namespace SAOCRSitePageGenerator
 
             foreach (KeyValuePair<string, Type> KVP in ReadOnly.SnippetFieldListDict)
             {
-                DataColumn DC = new DataColumn(KVP.Key, KVP.Value);
-                DC.Unique = KVP.Key == ReadOnly.SnippetFieldName;
-                DC.AllowDBNull = !(KVP.Key == ReadOnly.SnippetFieldName);
-                DT.Columns.Add(DC);
+                DT.Columns.Add(GenerateNewColumn(KVP.Key, KVP.Value));
             }
 
             DT.PrimaryKey = new DataColumn[] { DT.Columns[ReadOnly.SnippetFieldName] };
 
             foreach (string FieldName in FieldList)
             {
-                DataRow DR = DT.NewRow();
-                DR[ReadOnly.SnippetFieldName] = FieldName;
-                try { DT.Rows.Add(DR); }
-                catch (ConstraintException) { }
+                try { DT.Rows.Add(GenerateNewRow(DT, FieldName)); } catch (ConstraintException) { }
             }
 
             return DT;
+        }
+
+        private DataTable ModifyFieldListFromDatatable(DataTable DT, List<string> FieldNameList)
+        {
+            CheckFieldListDataColumn(ref DT);
+            CheckAndAddFieldInfoDataRow(ref DT, FieldNameList);
+            CheckAndRemoveFieldInfoDataRow(ref DT, FieldNameList);
+
+            return DT;
+        }
+
+        private DataColumn GenerateNewColumn(string ColumnName, Type ColumnDataType)
+        {
+            DataColumn DC = new DataColumn(ColumnName, ColumnDataType);
+            DC.Unique = ColumnName == ReadOnly.SnippetFieldName;
+            DC.AllowDBNull = !(ColumnName == ReadOnly.SnippetFieldName);
+            return DC;
+        }
+
+        private DataRow GenerateNewRow(DataTable FormatSourceDT, string FieldName)
+        {
+            DataRow DR = FormatSourceDT.NewRow();
+            DR[ReadOnly.SnippetFieldName] = FieldName;
+            return DR;
+        }
+
+        private void CheckFieldListDataColumn(ref DataTable DT)
+        {
+            foreach (KeyValuePair<string, Type> KVP in ReadOnly.SnippetFieldListDict)
+            {
+                if (!DT.Columns.Contains(KVP.Key))
+                {
+                    DT.Columns.Add(GenerateNewColumn(KVP.Key, KVP.Value));
+                }
+            }
+        }
+
+        private void CheckAndAddFieldInfoDataRow(ref DataTable DT, List<string> FieldNameList)
+        {
+            foreach (string FieldName in FieldNameList)
+            {
+                if (!DT.Rows.Contains(FieldName))
+                {
+                    try { DT.Rows.Add(GenerateNewRow(DT, FieldName)); } catch (ConstraintException) { }
+                }
+            }
+        }
+
+        private void CheckAndRemoveFieldInfoDataRow(ref DataTable DT, List<string> FieldNameList)
+        {
+            DataRow[] DRA = DT.Select();
+            foreach (DataRow DR in DRA)
+            {
+                string FieldName = DR[ReadOnly.SnippetFieldName].ToString();
+                if (DT.Rows.Contains(FieldName) && !FieldNameList.Contains(FieldName))
+                {
+                    DT.Rows.Remove(DR);
+                }
+            }
         }
         #endregion
 
@@ -273,7 +332,7 @@ namespace SAOCRSitePageGenerator
         }
         #endregion
 
-        private string ShowFolderDialog(string Description)
+        public string ShowFolderDialog(string Description)
         {
             FolderBrowserDialog FD = new FolderBrowserDialog();
             FD.Description = Description;
@@ -323,10 +382,18 @@ namespace SAOCRSitePageGenerator
                     SnippetFile += "/" + ReadOnly.SnippetStructSnippetLoop + " " + i;
                 }
 
-                using (StreamWriter SW = new StreamWriter(SnippetFile))
+                try
                 {
-                    SW.WriteAsync(SnippetCollection[i]);
+                    using (StreamWriter SW = new StreamWriter(SnippetFile))
+                    {
+                        SW.WriteAsync(SnippetCollection[i]);
+                    }
                 }
+                catch (IOException)
+                {
+                    MessageBox.Show("Snippet writing failed, ensure the file is not being used by another process and try again.");
+                }
+
             }
         }
 
@@ -334,16 +401,19 @@ namespace SAOCRSitePageGenerator
         {
             using (ConfigManager CM = new ConfigManager(ConfigPath))
             {
-                CM.SetConfig(ReadOnly.SnippetCreatedDate, DateTime.Now.ToString("yyyy/MM/dd tt HH:mm"));
+                if (!isEditMode)
+                {
+                    CM.SetConfig(ReadOnly.SnippetCreatedDate, DateTime.Now.ToString("yyyy/MM/dd tt HH:mm"));
+                }
                 CM.SetConfig(ReadOnly.SnippetLastUsed, DateTime.Now.ToString("yyyy/MM/dd tt HH:mm"));
                 CM.SetConfig(ReadOnly.SnippetDestination, OutputDestination.Text);
                 CM.SetConfig(ReadOnly.SnippetOutputExtension, OutputExtension.Text);
                 CM.SetConfig(ReadOnly.SnippetFieldBracketL, FieldBracketL.Text);
                 CM.SetConfig(ReadOnly.SnippetFieldBracketR, FieldBracketR.Text);
-                CM.SetConfig(ReadOnly.SnippetNotes, Notes.Text);
+                CM.SetConfig(ReadOnly.SnippetRemark, Remark.Text);
                 CM.SetConfig(ReadOnly.SnippetName, SnippetName.Text);
                 CM.SetConfig(ReadOnly.SnippetIsRepeatedSnippet, (SnippetCollection.Length > 1).ToString());
-                CM.SetConfig(ReadOnly.SnippetFolderKey, FolderKey.ToString());
+                CM.SetConfig(ReadOnly.SnippetGUID, SnippetKey.ToString());
                 
                 CM.SaveAsync();
             }
@@ -368,10 +438,10 @@ namespace SAOCRSitePageGenerator
                 OutputExtension.Text = CM.GetConfig(ReadOnly.SnippetOutputExtension);
                 FieldBracketL.Text = CM.GetConfig(ReadOnly.SnippetFieldBracketL);
                 FieldBracketR.Text = CM.GetConfig(ReadOnly.SnippetFieldBracketR);
-                Notes.Text = CM.GetConfig(ReadOnly.SnippetNotes);
+                Remark.Text = CM.GetConfig(ReadOnly.SnippetRemark);
                 SnippetName.Text = CM.GetConfig(ReadOnly.SnippetName);
 
-                FolderKey = new Guid(CM.GetConfig(ReadOnly.SnippetFolderKey));
+                SnippetKey = new Guid(CM.GetConfig(ReadOnly.SnippetGUID));
             }
         }
 

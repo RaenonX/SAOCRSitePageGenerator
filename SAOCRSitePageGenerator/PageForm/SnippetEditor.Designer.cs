@@ -1,6 +1,6 @@
 ﻿namespace SAOCRSitePageGenerator
 {
-    partial class NewSnippetInitializer
+    partial class SnippetEditor
     {
         /// <summary>
         /// Required designer variable.
@@ -31,7 +31,7 @@
             this.Submit = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.SnippetName = new System.Windows.Forms.TextBox();
-            this.Notes = new System.Windows.Forms.TextBox();
+            this.Remark = new System.Windows.Forms.TextBox();
             this.label = new System.Windows.Forms.Label();
             this.SnippetTitle = new System.Windows.Forms.Label();
             this.Snippet = new System.Windows.Forms.TextBox();
@@ -97,24 +97,24 @@
             this.SnippetName.Size = new System.Drawing.Size(222, 23);
             this.SnippetName.TabIndex = 1;
             // 
-            // Notes
+            // Remark
             // 
-            this.Notes.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
-            this.Notes.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.HistoryList;
-            this.Notes.ImeMode = System.Windows.Forms.ImeMode.Off;
-            this.Notes.Location = new System.Drawing.Point(578, 0);
-            this.Notes.Name = "Notes";
-            this.Notes.Size = new System.Drawing.Size(242, 23);
-            this.Notes.TabIndex = 2;
+            this.Remark.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.Remark.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.HistoryList;
+            this.Remark.ImeMode = System.Windows.Forms.ImeMode.Off;
+            this.Remark.Location = new System.Drawing.Point(583, 0);
+            this.Remark.Name = "Remark";
+            this.Remark.Size = new System.Drawing.Size(237, 23);
+            this.Remark.TabIndex = 2;
             // 
             // label
             // 
             this.label.Location = new System.Drawing.Point(523, 0);
             this.label.Margin = new System.Windows.Forms.Padding(3);
             this.label.Name = "label";
-            this.label.Size = new System.Drawing.Size(49, 23);
+            this.label.Size = new System.Drawing.Size(54, 23);
             this.label.TabIndex = 5;
-            this.label.Text = "Notes";
+            this.label.Text = "Remark";
             this.label.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // SnippetTitle
@@ -411,7 +411,7 @@
             this.NormalPanel.Controls.Add(this.SnippetName);
             this.NormalPanel.Controls.Add(this.label);
             this.NormalPanel.Controls.Add(this.ScanFields);
-            this.NormalPanel.Controls.Add(this.Notes);
+            this.NormalPanel.Controls.Add(this.Remark);
             this.NormalPanel.Controls.Add(this.label9);
             this.NormalPanel.Controls.Add(this.SnippetTitle);
             this.NormalPanel.Controls.Add(this.FieldListView);
@@ -430,7 +430,7 @@
             this.NormalPanel.Size = new System.Drawing.Size(1056, 699);
             this.NormalPanel.TabIndex = 26;
             // 
-            // NewSnippetInitializer
+            // SnippetEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -441,7 +441,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.MaximizeBox = false;
-            this.Name = "NewSnippetInitializer";
+            this.Name = "SnippetEditor";
             this.Text = "New Snippet Initializer";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
@@ -459,7 +459,7 @@
         private System.Windows.Forms.Button Submit;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox SnippetName;
-        private System.Windows.Forms.TextBox Notes;
+        private System.Windows.Forms.TextBox Remark;
         private System.Windows.Forms.Label label;
         private System.Windows.Forms.Label SnippetTitle;
         private System.Windows.Forms.TextBox Snippet;
