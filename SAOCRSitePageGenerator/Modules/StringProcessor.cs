@@ -31,7 +31,7 @@ namespace SAOCRSitePageGenerator
         public string Process(string CMDSingleLine, bool useHandledString)
         {
             if (string.IsNullOrEmpty(unHandledString)) { return string.Empty; }
-            List<string> ParsedCommand = new List<string>(CMDSingleLine.Split(new char[] { ' ' }, 2));
+            List<string> ParsedCommand = new List<string>(CMDSingleLine.Replace("\r", "").Split(new char[] { ' ' }, 3));
 
             while (ParsedCommand.Count < 3) { ParsedCommand.Add(string.Empty); }
             

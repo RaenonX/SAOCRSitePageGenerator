@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace SAOCRSitePageGenerator
 {
-    public delegate void SearchTestHandler(object sender, EventArgs e);
+    public delegate string SearchTestHandler(object sender, EventArgs e);
 }

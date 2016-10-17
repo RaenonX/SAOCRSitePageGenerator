@@ -306,19 +306,27 @@ namespace SAOCRSitePageGenerator
 
         private DialogResult ExecuteSnippet(KeyValuePair<string, string> SnippetInfo)
         {
-            using (LoadingBlock LB = new LoadingBlock())
+            try
             {
-                LB.StartPosition = FormStartPosition.CenterScreen;
+                using (LoadingBlock LB = new LoadingBlock())
+                {
+                    LB.StartPosition = FormStartPosition.CenterScreen;
 
-                LB.Show(this);
-                Application.DoEvents();
+                    LB.Show(this);
+                    Application.DoEvents();
 
-                SnippetExecutor SG = new SnippetExecutor(SnippetInfo);
-                
-                LB.Close();
-                Application.DoEvents();
+                    SnippetExecutor SG = new SnippetExecutor(SnippetInfo);
 
-                return SG.ShowDialog(this);
+                    LB.Close();
+                    Application.DoEvents();
+
+                    return SG.ShowDialog(this);
+                }
+            }
+            catch (DataColumnNotExistException)
+            {
+                MessageBox.Show("Field List DataColumn is out of date. Please open snippet editor, rescan fields, and try again.");
+                return DialogResult.Abort;
             }
         }
 
@@ -357,7 +365,7 @@ namespace SAOCRSitePageGenerator
                         LVI.SubItems.RemoveByKey("Empty");
                         LVI.SubItems[ReadOnly.SourceDataTableList].Text = GetDTListString(DS);
                         LVI.SubItems[ReadOnly.SourceDataSetName].Text = string.IsNullOrEmpty(Pair.Value) ? "(No Name)" : Pair.Value;
-                        LVI.SubItems[ReadOnly.SourceDataSetLoaded].Text = Static.SnippetExternalSource.ContainsKey(new Guid(Pair.Key)).ToString();
+                        LVI.SubItems[ReadOnly.SourceDataSetLoaded].Text = Static.SnippetExternalSourceDataSet.ContainsKey(new Guid(Pair.Key)).ToString();
                         LVI.SubItems[ReadOnly.SourceDataSetGUID].Text = Pair.Key;
 
                         DSList.Items.Add(LVI);
@@ -372,7 +380,7 @@ namespace SAOCRSitePageGenerator
         {
             string ListString = "";
 
-            foreach (DataRow DR in DS.Tables[ReadOnly.SourceDataTableInfoTable].Rows)
+            foreach (DataRow DR in DS.Tables[ReadOnly.SourceDataTableInfoTableName].Rows)
             {
                 ListString += DR[ReadOnly.SourceDataTableName] + ", ";
             }
@@ -390,9 +398,10 @@ namespace SAOCRSitePageGenerator
 
         private void RemoveDS(Guid DSGuid)
         {
-            if (Static.SnippetExternalSource.ContainsKey(DSGuid))
+            if (Static.SnippetExternalSourceName.ContainsKey(DSGuid))
             {
-                Static.SnippetExternalSource.Remove(DSGuid);
+                Static.SnippetExternalSourceDataSet.Remove(DSGuid);
+                Static.SnippetExternalSourceName.Remove(DSGuid);
             }
             using (ConfigManager CM = new ConfigManager(ReadOnly.SourceDataSetDict))
             {
@@ -421,9 +430,11 @@ namespace SAOCRSitePageGenerator
             {
                 Guid DSGuid = new Guid(LVI.SubItems[ReadOnly.SourceDataSetGUID].Text);
                 DataSet DSToAdd = ReadDataSetXML(ReadOnly.SourcePath + "/" + LVI.SubItems[ReadOnly.SourceDataSetGUID].Text);
-                if (!Static.SnippetExternalSource.ContainsKey(DSGuid))
+                string DSName = LVI.SubItems[ReadOnly.SourceDataSetName].Text;
+                if (!Static.SnippetExternalSourceName.ContainsKey(DSGuid))
                 {
-                    Static.SnippetExternalSource.Add(DSGuid, DSToAdd);
+                    Static.SnippetExternalSourceDataSet.Add(DSGuid, DSToAdd);
+                    Static.SnippetExternalSourceName.Add(DSGuid, DSName);
                 }
             }
             RefreshDSList();
@@ -434,9 +445,10 @@ namespace SAOCRSitePageGenerator
             foreach (ListViewItem LVI in DSList.SelectedItems)
             {
                 Guid DSGuid = new Guid(LVI.SubItems[ReadOnly.SourceDataSetGUID].Text);
-                if (Static.SnippetExternalSource.ContainsKey(DSGuid))
+                if (Static.SnippetExternalSourceName.ContainsKey(DSGuid))
                 {
-                    Static.SnippetExternalSource.Remove(DSGuid);
+                    Static.SnippetExternalSourceDataSet.Remove(DSGuid);
+                    Static.SnippetExternalSourceName.Remove(DSGuid);
                 }
             }
             RefreshDSList();

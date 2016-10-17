@@ -30,23 +30,27 @@ namespace SAOCRSitePageGenerator
         public static readonly string SnippetFieldBracketR = "Field Bracket R";
         public static readonly string SnippetIsRepeatedSnippet = "Repeated Snippet";
 
+        public static readonly string SnippetFieldIndex = "Field Index";
         public static readonly string SnippetFieldName = "Field Name";
-        public static readonly string SnippetFieldPlaceValue = "Value";
+        public static readonly string SnippetFieldManualValue = "Value";
         public static readonly string SnippetFieldAutoFill = "Auto Fill";
         public static readonly string SnippetFieldReadOnly = "ReadOnly";
         public static readonly string SnippetFieldDataSet = "Data Set";
-        public static readonly string SnippetFieldDataSource = "Data Source";
-        public static readonly string SnippetFieldDataSelect = "Data Select";
+        public static readonly string SnippetFieldDataTable = "Data Table";
+        public static readonly string SnippetFieldDataForLoopUse = "Data For Loop";
+        public static readonly string SnippetFieldDataQuery = "Data Query";
+        public static readonly string SnippetFieldDataQueryReturnColumnName = "Data Column Return Name";
         public static readonly string SnippetFieldForInternalUse = "Internal";
-        public static readonly string SnippetFieldProcessCMD = "Process Command";
+        public static readonly string SnippetFieldProcessCMD = "String Process";
+
 
         public static readonly string[] SnippetsListKeys = { SnippetName, SnippetCreatedDate, SnippetLastUsed, SnippetRemark, SnippetGUID };
 
         public static readonly string[] SnippetStructSingle = { SnippetStructSnippet, SnippetStructFieldList, SnippetStructConfig };
         public static readonly string[] SnippetStructMulti = { SnippetStructSnippetHead, SnippetStructSnippetLoop, SnippetStructSnippetEnd, SnippetStructFieldList, SnippetStructConfig };
         public static readonly string[] SnippetConfigKeys = { SnippetName, SnippetDestination, SnippetOutputExtension, SnippetFieldBracketL, SnippetFieldBracketR, SnippetCreatedDate, SnippetLastUsed, SnippetRemark, SnippetIsRepeatedSnippet };
-        public static readonly string[] SnippetFieldListKeys = { SnippetFieldName, SnippetFieldPlaceValue, SnippetFieldAutoFill, SnippetFieldReadOnly, SnippetFieldDataSet, SnippetFieldDataSource, SnippetFieldDataSelect, SnippetFieldForInternalUse, SnippetFieldProcessCMD };
-        public static readonly Type[] SnippetFieldListValues = { typeof(string), typeof(string), typeof(bool), typeof(bool), typeof(string), typeof(string), typeof(string), typeof(bool), typeof(string) };
+        public static readonly string[] SnippetFieldListKeys = { SnippetFieldIndex, SnippetFieldName, SnippetFieldManualValue, SnippetFieldAutoFill, SnippetFieldReadOnly, SnippetFieldDataSet, SnippetFieldDataTable, SnippetFieldDataForLoopUse, SnippetFieldDataQuery, SnippetFieldDataQueryReturnColumnName, SnippetFieldForInternalUse, SnippetFieldProcessCMD };
+        public static readonly Type[] SnippetFieldListValues = { typeof(int), typeof(string), typeof(string), typeof(bool), typeof(bool), typeof(string), typeof(string), typeof(bool), typeof(string), typeof(string), typeof(bool), typeof(string) };
         public static readonly Dictionary<string, Type> SnippetFieldListDict = Static.SnippetFieldListDict;
 
 
@@ -59,7 +63,7 @@ namespace SAOCRSitePageGenerator
         public static readonly string SourceDataTableList = "DataTable List";
         public static readonly string SourceDataTableRemark = "DataTable Remark";
         public static readonly string SourceDataTableGUID = "DataTable GUID";
-        public static readonly string SourceDataTableInfoTable = "DataTable Information Table";
+        public static readonly string SourceDataTableInfoTableName = "DataTable Information Table";
         public static readonly string SourceDataTableColumnCount = "Column Count";
         public static readonly string SourceDataTableRowCount = "Row Count";
         public static readonly string SourceDataSetGUID = "DataSet GUID";

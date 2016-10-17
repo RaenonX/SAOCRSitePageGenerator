@@ -34,6 +34,7 @@
             this.DSName = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.DCManager = new System.Windows.Forms.GroupBox();
+            this.DCLoad = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.DCExpr = new System.Windows.Forms.TextBox();
             this.DCRemove = new System.Windows.Forms.Button();
@@ -70,13 +71,13 @@
             this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
-            // DataTableView
+            // DTView
             // 
             this.DTView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.DTView.ImeMode = System.Windows.Forms.ImeMode.Off;
-            this.DTView.Location = new System.Drawing.Point(334, 245);
-            this.DTView.Name = "DataTableView";
-            this.DTView.Size = new System.Drawing.Size(863, 412);
+            this.DTView.Location = new System.Drawing.Point(269, 245);
+            this.DTView.Name = "DTView";
+            this.DTView.Size = new System.Drawing.Size(928, 412);
             this.DTView.TabIndex = 0;
             // 
             // Save
@@ -105,7 +106,7 @@
             this.DSName.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.DSName.Location = new System.Drawing.Point(110, 22);
             this.DSName.Name = "DSName";
-            this.DSName.Size = new System.Drawing.Size(200, 23);
+            this.DSName.Size = new System.Drawing.Size(135, 23);
             this.DSName.TabIndex = 24;
             // 
             // groupBox1
@@ -114,13 +115,14 @@
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(316, 50);
+            this.groupBox1.Size = new System.Drawing.Size(251, 50);
             this.groupBox1.TabIndex = 28;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "DataSet Basic Information";
             // 
             // DCManager
             // 
+            this.DCManager.Controls.Add(this.DCLoad);
             this.DCManager.Controls.Add(this.label5);
             this.DCManager.Controls.Add(this.DCExpr);
             this.DCManager.Controls.Add(this.DCRemove);
@@ -132,12 +134,22 @@
             this.DCManager.Controls.Add(this.label4);
             this.DCManager.Controls.Add(this.label3);
             this.DCManager.Controls.Add(this.DCName);
-            this.DCManager.Location = new System.Drawing.Point(334, 186);
+            this.DCManager.Location = new System.Drawing.Point(269, 186);
             this.DCManager.Name = "DCManager";
-            this.DCManager.Size = new System.Drawing.Size(863, 53);
+            this.DCManager.Size = new System.Drawing.Size(928, 53);
             this.DCManager.TabIndex = 29;
             this.DCManager.TabStop = false;
             this.DCManager.Text = "DataColumn Manager";
+            // 
+            // DCLoad
+            // 
+            this.DCLoad.Font = new System.Drawing.Font("Microsoft JhengHei", 9F);
+            this.DCLoad.Location = new System.Drawing.Point(794, 22);
+            this.DCLoad.Name = "DCLoad";
+            this.DCLoad.Size = new System.Drawing.Size(58, 23);
+            this.DCLoad.TabIndex = 34;
+            this.DCLoad.Text = "Load";
+            this.DCLoad.UseVisualStyleBackColor = true;
             // 
             // label5
             // 
@@ -162,7 +174,7 @@
             // 
             this.DCRemove.Enabled = false;
             this.DCRemove.Font = new System.Drawing.Font("Microsoft JhengHei", 9F);
-            this.DCRemove.Location = new System.Drawing.Point(794, 22);
+            this.DCRemove.Location = new System.Drawing.Point(858, 22);
             this.DCRemove.Name = "DCRemove";
             this.DCRemove.Size = new System.Drawing.Size(63, 23);
             this.DCRemove.TabIndex = 31;
@@ -247,15 +259,15 @@
             this.DCName.Size = new System.Drawing.Size(102, 23);
             this.DCName.TabIndex = 22;
             // 
-            // DataTableMemo
+            // DSMemo
             // 
             this.DSMemo.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this.DSMemo.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.HistoryList;
             this.DSMemo.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.DSMemo.Location = new System.Drawing.Point(12, 89);
             this.DSMemo.Multiline = true;
-            this.DSMemo.Name = "DataTableMemo";
-            this.DSMemo.Size = new System.Drawing.Size(316, 568);
+            this.DSMemo.Name = "DSMemo";
+            this.DSMemo.Size = new System.Drawing.Size(251, 568);
             this.DSMemo.TabIndex = 32;
             // 
             // DTList
@@ -277,7 +289,7 @@
             this.DTList.MultiSelect = false;
             this.DTList.Name = "DTList";
             this.DTList.ShowItemToolTips = true;
-            this.DTList.Size = new System.Drawing.Size(782, 111);
+            this.DTList.Size = new System.Drawing.Size(847, 111);
             this.DTList.TabIndex = 33;
             this.DTList.UseCompatibleStateImageBehavior = false;
             this.DTList.View = System.Windows.Forms.View.Details;
@@ -290,12 +302,12 @@
             // DTName
             // 
             this.DTName.Text = "DataTable Name";
-            this.DTName.Width = 130;
+            this.DTName.Width = 145;
             // 
             // DTRemark
             // 
             this.DTRemark.Text = "DataTable Remark";
-            this.DTRemark.Width = 165;
+            this.DTRemark.Width = 190;
             // 
             // DTColumnCount
             // 
@@ -316,7 +328,7 @@
             // 
             this.DTRemove.Enabled = false;
             this.DTRemove.Font = new System.Drawing.Font("Microsoft JhengHei", 9F);
-            this.DTRemove.Location = new System.Drawing.Point(794, 56);
+            this.DTRemove.Location = new System.Drawing.Point(859, 56);
             this.DTRemove.Name = "DTRemove";
             this.DTRemove.Size = new System.Drawing.Size(63, 28);
             this.DTRemove.TabIndex = 34;
@@ -335,9 +347,9 @@
             this.groupBox3.Controls.Add(this.DTLoad);
             this.groupBox3.Controls.Add(this.DTList);
             this.groupBox3.Controls.Add(this.DTRemove);
-            this.groupBox3.Location = new System.Drawing.Point(334, 12);
+            this.groupBox3.Location = new System.Drawing.Point(269, 12);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(863, 168);
+            this.groupBox3.Size = new System.Drawing.Size(928, 168);
             this.groupBox3.TabIndex = 35;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "DataTable Manager";
@@ -365,7 +377,7 @@
             // 
             this.DTCurrent.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.DTCurrent.Font = new System.Drawing.Font("Microsoft JhengHei", 9.5F);
-            this.DTCurrent.Location = new System.Drawing.Point(671, 139);
+            this.DTCurrent.Location = new System.Drawing.Point(736, 139);
             this.DTCurrent.Margin = new System.Windows.Forms.Padding(3);
             this.DTCurrent.Name = "DTCurrent";
             this.DTCurrent.Size = new System.Drawing.Size(186, 23);
@@ -374,7 +386,7 @@
             // 
             // label7
             // 
-            this.label7.Location = new System.Drawing.Point(564, 139);
+            this.label7.Location = new System.Drawing.Point(629, 139);
             this.label7.Margin = new System.Windows.Forms.Padding(3);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(101, 23);
@@ -385,7 +397,7 @@
             // DTNew
             // 
             this.DTNew.Font = new System.Drawing.Font("Microsoft JhengHei", 9F);
-            this.DTNew.Location = new System.Drawing.Point(794, 22);
+            this.DTNew.Location = new System.Drawing.Point(859, 22);
             this.DTNew.Name = "DTNew";
             this.DTNew.Size = new System.Drawing.Size(63, 28);
             this.DTNew.TabIndex = 36;
@@ -408,14 +420,14 @@
             this.DTRemarkToAdd.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.DTRemarkToAdd.Location = new System.Drawing.Point(356, 139);
             this.DTRemarkToAdd.Name = "DTRemarkToAdd";
-            this.DTRemarkToAdd.Size = new System.Drawing.Size(202, 23);
+            this.DTRemarkToAdd.Size = new System.Drawing.Size(267, 23);
             this.DTRemarkToAdd.TabIndex = 28;
             // 
             // DTLoad
             // 
             this.DTLoad.Enabled = false;
             this.DTLoad.Font = new System.Drawing.Font("Microsoft JhengHei", 9F);
-            this.DTLoad.Location = new System.Drawing.Point(794, 90);
+            this.DTLoad.Location = new System.Drawing.Point(859, 90);
             this.DTLoad.Name = "DTLoad";
             this.DTLoad.Size = new System.Drawing.Size(63, 43);
             this.DTLoad.TabIndex = 35;
@@ -427,7 +439,7 @@
             this.label6.Location = new System.Drawing.Point(12, 68);
             this.label6.Margin = new System.Windows.Forms.Padding(3);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(316, 15);
+            this.label6.Size = new System.Drawing.Size(116, 15);
             this.label6.TabIndex = 37;
             this.label6.Text = "DataSet Document";
             this.label6.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
@@ -437,10 +449,10 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1209, 710);
+            this.Controls.Add(this.DCManager);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.DSMemo);
-            this.Controls.Add(this.DCManager);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.Save);
             this.Controls.Add(this.DTView);
@@ -500,5 +512,6 @@
         private System.Windows.Forms.TextBox DTNameToAdd;
         private System.Windows.Forms.ColumnHeader DTGuid;
         private System.Windows.Forms.ColumnHeader Empty;
+        private System.Windows.Forms.Button DCLoad;
     }
 }

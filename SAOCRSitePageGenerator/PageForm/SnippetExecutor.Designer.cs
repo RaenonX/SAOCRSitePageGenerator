@@ -38,7 +38,7 @@
             // 
             // Generate
             // 
-            this.Generate.Location = new System.Drawing.Point(1023, 681);
+            this.Generate.Location = new System.Drawing.Point(1174, 681);
             this.Generate.Name = "Generate";
             this.Generate.Size = new System.Drawing.Size(85, 24);
             this.Generate.TabIndex = 2;
@@ -49,7 +49,7 @@
             // 
             this.Panel.Location = new System.Drawing.Point(12, 12);
             this.Panel.Name = "Panel";
-            this.Panel.Size = new System.Drawing.Size(1096, 663);
+            this.Panel.Size = new System.Drawing.Size(1247, 663);
             this.Panel.TabIndex = 3;
             // 
             // label7
@@ -75,7 +75,7 @@
             // ProgressText
             // 
             this.ProgressText.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.ProgressText.Location = new System.Drawing.Point(731, 681);
+            this.ProgressText.Location = new System.Drawing.Point(882, 681);
             this.ProgressText.Margin = new System.Windows.Forms.Padding(3);
             this.ProgressText.Name = "ProgressText";
             this.ProgressText.Size = new System.Drawing.Size(286, 24);
@@ -85,7 +85,7 @@
             // 
             // label2
             // 
-            this.label2.Location = new System.Drawing.Point(674, 681);
+            this.label2.Location = new System.Drawing.Point(825, 681);
             this.label2.Margin = new System.Windows.Forms.Padding(3);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(51, 24);
@@ -97,7 +97,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1120, 713);
+            this.ClientSize = new System.Drawing.Size(1272, 713);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.ProgressText);
             this.Controls.Add(this.OutputDestination);

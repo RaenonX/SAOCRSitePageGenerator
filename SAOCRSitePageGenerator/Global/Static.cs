@@ -9,7 +9,8 @@ namespace SAOCRSitePageGenerator
 {
     public static class Static
     {
-        public static Dictionary<Guid, DataSet> SnippetExternalSource = new Dictionary<Guid, DataSet>();
+        public static Dictionary<Guid, DataSet> SnippetExternalSourceDataSet = new Dictionary<Guid, DataSet>();
+        public static Dictionary<Guid, string> SnippetExternalSourceName = new Dictionary<Guid, string>();
 
         public static Dictionary<string, Type> SnippetFieldListDict = new Dictionary<string, Type>();
         public static Dictionary<string, Type> SourceDataTableInfoTableDict = new Dictionary<string, Type>();

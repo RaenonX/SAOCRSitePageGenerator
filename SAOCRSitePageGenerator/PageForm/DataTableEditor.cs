@@ -44,8 +44,8 @@ namespace SAOCRSitePageGenerator
             Save.Click += Save_Click;
             DCAdd.Click += DCAdd_Click;
             DCRemove.Click += DCRemove_Click;
+            DCLoad.Click += DCLoad_Click;
 
-            DTView.CurrentCellChanged += DTView_CurrentCellChanged;
             foreach (DataTable DT in DS.Tables)
             {
                 DT.ColumnChanged += DT_ColumnChanged;
@@ -109,7 +109,11 @@ namespace SAOCRSitePageGenerator
 
         private void DCRemove_Click(object sender, EventArgs e)
         {
-            if (!DS.Tables[CurrentDTGuid.ToString()].Columns.Contains(DCinDCManager.ColumnName)) { DS.Tables[CurrentDTGuid.ToString()].Columns.Remove(DCinDCManager); }
+            if (DCinDCManager != null)
+            {
+                RemoveDataColumnLoadedInDCManager(DCinDCManager);
+                SetEnableByLoadedStatusForDCManager(false);
+            }
         }
 
         private void DCAdd_Click(object sender, EventArgs e)
@@ -118,22 +122,29 @@ namespace SAOCRSitePageGenerator
             if (DC != null && !DS.Tables[CurrentDTGuid.ToString()].Columns.Contains(DC.ColumnName)) { DS.Tables[CurrentDTGuid.ToString()].Columns.Add(DC); } 
         }
 
-        private void DTView_CurrentCellChanged(object sender, EventArgs e)
+        private void DCLoad_Click(object sender, EventArgs e)
         {
-            bool HasSelectedColumn = false;
-
-            foreach (DataColumn DC in DTView.SelectedColumns)
+            if (DCinDCManager == null)
             {
-                HasSelectedColumn = true;
-            }
+                int ColumnIndexInDTView = -1;
 
-            if (HasSelectedColumn)
+                try
+                {
+                    ColumnIndexInDTView = DTView.SelectedCells[0].ColumnIndex;
+                }
+                catch (Exception) { }
+
+                if (ColumnIndexInDTView >= 0)
+                {
+                    DataColumn DC = DS.Tables[CurrentDTGuid.ToString()].Columns[ColumnIndexInDTView];
+                    LoadDataColumnToDCManager(DC);
+                }
+                SetEnableByLoadedStatusForDCManager(ColumnIndexInDTView >= 0);
+            } else
             {
-                DataColumn DC = DS.Tables[CurrentDTGuid.ToString()].Columns[DTView.SelectedColumns[0].Name];
-                LoadDataColumnToDCManager(DC);
-                DCinDCManager = DC;
+                UnloadDataColumnFromDCManager();
+                SetEnableByLoadedStatusForDCManager(false);
             }
-            SetEnabledforDCManager(HasSelectedColumn);
         }
 
         private void DSMemo_KeyDown(object sender, KeyEventArgs e)
@@ -218,14 +229,15 @@ namespace SAOCRSitePageGenerator
         #region Methods
 
         #region Control Modifying
-        private void SetEnabledforDCManager(bool isReadOnly)
+        private void SetEnableByLoadedStatusForDCManager(bool isLoaded)
         {
-            DCAdd.Enabled = !isReadOnly;
-            DCRemove.Enabled = isReadOnly;
-            DCName.ReadOnly = isReadOnly;
-            DCExpr.ReadOnly = isReadOnly;
-            DCType.Enabled = !isReadOnly;
-            DCAllowNull.Enabled = DCUnique.Enabled = DCPrimaryKey.Enabled = !isReadOnly;
+            DCAdd.Enabled = !isLoaded;
+            DCRemove.Enabled = isLoaded;
+            DCName.ReadOnly = isLoaded;
+            DCExpr.ReadOnly = isLoaded;
+            DCType.Enabled = !isLoaded;
+            DCAllowNull.Enabled = DCUnique.Enabled = DCPrimaryKey.Enabled = !isLoaded;
+            DCLoad.Text = isLoaded ? "Unload" : "Load";
         }
 
         private void SetEnabledForDTManager(bool Enabled)
@@ -260,6 +272,38 @@ namespace SAOCRSitePageGenerator
             DCUnique.Checked = DC.Unique;
             DCAllowNull.Checked = DC.AllowDBNull;
             DCPrimaryKey.Checked = DS.Tables[CurrentDTGuid.ToString()].PrimaryKey.Contains(DC);
+        }
+
+        private void UnloadDataColumnFromDCManager()
+        {
+            DCinDCManager = null;
+            DCName.Text = "";
+            DCType.Text = "System.String";
+            DCUnique.Checked = false;
+            DCAllowNull.Checked = false;
+            DCPrimaryKey.Checked = false;
+        }
+
+        private void RemoveDataColumnLoadedInDCManager(DataColumn DC)
+        {
+            if (DS.Tables[CurrentDTGuid.ToString()].Columns.Contains(DC.ColumnName))
+            {
+                try
+                {
+                    DS.Tables[CurrentDTGuid.ToString()].Columns.Remove(DC);
+                }
+                catch (ArgumentException)
+                {
+                    if (MessageBox.Show("The data column you are trying to remove is a primary key of the data table you loaded. Are you sure want to delete this data column?", "DataColumn Deletion Confirmation", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    {
+                        List<DataColumn> DCL = DS.Tables[CurrentDTGuid.ToString()].PrimaryKey.ToList();
+                        DCL.Remove(DC);
+                        DS.Tables[CurrentDTGuid.ToString()].PrimaryKey = DCL.ToArray();
+                        DS.Tables[CurrentDTGuid.ToString()].Columns.Remove(DC);
+                    }
+                }
+            }
+            UnloadDataColumnFromDCManager();
         }
 
         private DataColumn WrtieDCManagerToDataColumn()
@@ -348,7 +392,7 @@ namespace SAOCRSitePageGenerator
 
         private DataTable NewDataTableInfoTable()
         {
-            DataTable DT = new DataTable(ReadOnly.SourceDataTableInfoTable);
+            DataTable DT = new DataTable(ReadOnly.SourceDataTableInfoTableName);
 
             foreach (KeyValuePair<string, Type> InfoTColInfo in ReadOnly.SourceDataTableInfoTableDict)
             {
@@ -361,19 +405,19 @@ namespace SAOCRSitePageGenerator
 
         private void RegisterDTToDataSet(Guid TableID)
         {
-            DataRow DR = DS.Tables[ReadOnly.SourceDataTableInfoTable].NewRow();
+            DataRow DR = DS.Tables[ReadOnly.SourceDataTableInfoTableName].NewRow();
             DR[ReadOnly.SourceDataTableName] = string.IsNullOrEmpty(DTNameToAdd.Text) ? "(No Name)" : DTNameToAdd.Text;
             DR[ReadOnly.SourceDataTableRemark] = DTRemarkToAdd.Text;
             DR[ReadOnly.SourceDataTableGUID] = TableID.ToString();
-            DS.Tables[ReadOnly.SourceDataTableInfoTable].Rows.Add(DR);
+            DS.Tables[ReadOnly.SourceDataTableInfoTableName].Rows.Add(DR);
         }
 
         private void RemoveDTFromDataSet(Guid TableID)
         {
-            DataRow[] DataRowInInfoTableToRemove = DS.Tables[ReadOnly.SourceDataTableInfoTable].Select("[" + ReadOnly.SourceDataTableGUID + "] = '" + TableID.ToString() + "'");
+            DataRow[] DataRowInInfoTableToRemove = DS.Tables[ReadOnly.SourceDataTableInfoTableName].Select("[" + ReadOnly.SourceDataTableGUID + "] = '" + TableID.ToString() + "'");
             foreach (DataRow DR in DataRowInInfoTableToRemove)
             {
-                DS.Tables[ReadOnly.SourceDataTableInfoTable].Rows.Remove(DR);
+                DS.Tables[ReadOnly.SourceDataTableInfoTableName].Rows.Remove(DR);
             }
 
             DS.Tables.Remove(TableID.ToString());
@@ -388,7 +432,7 @@ namespace SAOCRSitePageGenerator
             bool CurrentDTIsNull = CurrentDTGuid == Guid.Empty || CurrentDTGuid == null;
             DTView.DataSource = CurrentDTIsNull ? null : DS.Tables[CurrentDTGuid.ToString()];
 
-            DataRow[] SearchTableInfoByGuid = DS.Tables[ReadOnly.SourceDataTableInfoTable].Select("[" + ReadOnly.SourceDataTableGUID + "] = '" + CurrentDTGuid.ToString() + "'");
+            DataRow[] SearchTableInfoByGuid = DS.Tables[ReadOnly.SourceDataTableInfoTableName].Select("[" + ReadOnly.SourceDataTableGUID + "] = '" + CurrentDTGuid.ToString() + "'");
             DTCurrent.Text = SearchTableInfoByGuid.Length > 0 ? SearchTableInfoByGuid[0][ReadOnly.SourceDataTableName].ToString() : "";
 
             DCManager.Enabled = !CurrentDTIsNull;
@@ -400,7 +444,7 @@ namespace SAOCRSitePageGenerator
             {
                 CM.SetConfig(CurrentDTGuid.ToString(), DTNameToAdd.Text);
 
-                DataRow[] DataRowInInfoTableToRemove = DS.Tables[ReadOnly.SourceDataTableInfoTable].Select("[" + ReadOnly.SourceDataTableGUID + "] = '" + CurrentDTGuid.ToString() + "'");
+                DataRow[] DataRowInInfoTableToRemove = DS.Tables[ReadOnly.SourceDataTableInfoTableName].Select("[" + ReadOnly.SourceDataTableGUID + "] = '" + CurrentDTGuid.ToString() + "'");
                 foreach (DataRow DR in DataRowInInfoTableToRemove)
                 {
                     DR[ReadOnly.SourceDataTableName] = DTNameToAdd.Text;
@@ -413,7 +457,7 @@ namespace SAOCRSitePageGenerator
         {
             DTList.Items.Clear();
 
-            foreach (DataRow DR in DS.Tables[ReadOnly.SourceDataTableInfoTable].Rows)
+            foreach (DataRow DR in DS.Tables[ReadOnly.SourceDataTableInfoTableName].Rows)
             {
                 ListViewItem LVI = CreateListViewItemFitToListView(DTList);
                 LVI.SubItems.RemoveByKey("Empty");

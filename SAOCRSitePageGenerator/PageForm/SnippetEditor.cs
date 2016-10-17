@@ -197,14 +197,14 @@ namespace SAOCRSitePageGenerator
 
             foreach (KeyValuePair<string, Type> KVP in ReadOnly.SnippetFieldListDict)
             {
-                DT.Columns.Add(GenerateNewColumn(KVP.Key, KVP.Value));
+                DT.Columns.Add(CreateNewColumn(KVP.Key, KVP.Value));
             }
 
             DT.PrimaryKey = new DataColumn[] { DT.Columns[ReadOnly.SnippetFieldName] };
 
             foreach (string FieldName in FieldList)
             {
-                try { DT.Rows.Add(GenerateNewRow(DT, FieldName)); } catch (ConstraintException) { }
+                try { DT.Rows.Add(CreateNewRow(DT, FieldName)); } catch (ConstraintException) { }
             }
 
             return DT;
@@ -212,14 +212,15 @@ namespace SAOCRSitePageGenerator
 
         private DataTable ModifyFieldListFromDatatable(DataTable DT, List<string> FieldNameList)
         {
-            CheckFieldListDataColumn(ref DT);
+            CheckAndAddFieldListDataColumn(ref DT);
+            CheckAndRemoveFieldListDataColumn(ref DT);
             CheckAndAddFieldInfoDataRow(ref DT, FieldNameList);
             CheckAndRemoveFieldInfoDataRow(ref DT, FieldNameList);
 
             return DT;
         }
 
-        private DataColumn GenerateNewColumn(string ColumnName, Type ColumnDataType)
+        private DataColumn CreateNewColumn(string ColumnName, Type ColumnDataType)
         {
             DataColumn DC = new DataColumn(ColumnName, ColumnDataType);
             DC.Unique = ColumnName == ReadOnly.SnippetFieldName;
@@ -227,21 +228,37 @@ namespace SAOCRSitePageGenerator
             return DC;
         }
 
-        private DataRow GenerateNewRow(DataTable FormatSourceDT, string FieldName)
+        private DataRow CreateNewRow(DataTable FormatSourceDT, string FieldName)
         {
             DataRow DR = FormatSourceDT.NewRow();
             DR[ReadOnly.SnippetFieldName] = FieldName;
             return DR;
         }
 
-        private void CheckFieldListDataColumn(ref DataTable DT)
+        private void CheckAndAddFieldListDataColumn(ref DataTable DT)
         {
             foreach (KeyValuePair<string, Type> KVP in ReadOnly.SnippetFieldListDict)
             {
                 if (!DT.Columns.Contains(KVP.Key))
                 {
-                    DT.Columns.Add(GenerateNewColumn(KVP.Key, KVP.Value));
+                    DT.Columns.Add(CreateNewColumn(KVP.Key, KVP.Value));
                 }
+            }
+        }
+
+        private void CheckAndRemoveFieldListDataColumn(ref DataTable DT)
+        {
+            List<DataColumn> DCToRemove = new List<DataColumn>();
+            foreach (DataColumn DC in DT.Columns)
+            {
+                if (!ReadOnly.SnippetFieldListDict.ContainsKey(DC.ColumnName))
+                {
+                    DCToRemove.Add(DC);
+                }
+            }
+            foreach (DataColumn DC in DCToRemove)
+            {
+                DT.Columns.Remove(DC);
             }
         }
 
@@ -251,7 +268,7 @@ namespace SAOCRSitePageGenerator
             {
                 if (!DT.Rows.Contains(FieldName))
                 {
-                    try { DT.Rows.Add(GenerateNewRow(DT, FieldName)); } catch (ConstraintException) { }
+                    try { DT.Rows.Add(CreateNewRow(DT, FieldName)); } catch (ConstraintException) { }
                 }
             }
         }

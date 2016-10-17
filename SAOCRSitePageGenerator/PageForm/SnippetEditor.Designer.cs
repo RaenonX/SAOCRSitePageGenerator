@@ -70,7 +70,7 @@
             // Submit
             // 
             this.Submit.Enabled = false;
-            this.Submit.Location = new System.Drawing.Point(971, 662);
+            this.Submit.Location = new System.Drawing.Point(971, 762);
             this.Submit.Name = "Submit";
             this.Submit.Size = new System.Drawing.Size(85, 38);
             this.Submit.TabIndex = 10;
@@ -136,19 +136,19 @@
             this.Snippet.Location = new System.Drawing.Point(0, 97);
             this.Snippet.Multiline = true;
             this.Snippet.Name = "Snippet";
-            this.Snippet.Size = new System.Drawing.Size(562, 527);
+            this.Snippet.Size = new System.Drawing.Size(1056, 339);
             this.Snippet.TabIndex = 7;
             // 
             // ProgressBar
             // 
-            this.ProgressBar.Location = new System.Drawing.Point(0, 662);
+            this.ProgressBar.Location = new System.Drawing.Point(0, 762);
             this.ProgressBar.Name = "ProgressBar";
             this.ProgressBar.Size = new System.Drawing.Size(965, 14);
             this.ProgressBar.TabIndex = 9;
             // 
             // label3
             // 
-            this.label3.Location = new System.Drawing.Point(0, 682);
+            this.label3.Location = new System.Drawing.Point(0, 782);
             this.label3.Margin = new System.Windows.Forms.Padding(3);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(62, 18);
@@ -158,7 +158,7 @@
             // 
             // ProgressText
             // 
-            this.ProgressText.Location = new System.Drawing.Point(68, 682);
+            this.ProgressText.Location = new System.Drawing.Point(68, 782);
             this.ProgressText.Margin = new System.Windows.Forms.Padding(3);
             this.ProgressText.Name = "ProgressText";
             this.ProgressText.Size = new System.Drawing.Size(897, 18);
@@ -283,15 +283,15 @@
             this.FieldListView.AllowUserToResizeRows = false;
             this.FieldListView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.FieldListView.ImeMode = System.Windows.Forms.ImeMode.Off;
-            this.FieldListView.Location = new System.Drawing.Point(568, 97);
+            this.FieldListView.Location = new System.Drawing.Point(0, 474);
             this.FieldListView.Name = "FieldListView";
             this.FieldListView.RowHeadersVisible = false;
-            this.FieldListView.Size = new System.Drawing.Size(488, 559);
+            this.FieldListView.Size = new System.Drawing.Size(1056, 282);
             this.FieldListView.TabIndex = 9;
             // 
             // label9
             // 
-            this.label9.Location = new System.Drawing.Point(568, 69);
+            this.label9.Location = new System.Drawing.Point(0, 446);
             this.label9.Margin = new System.Windows.Forms.Padding(3);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(62, 22);
@@ -373,7 +373,7 @@
             // NextSnippet
             // 
             this.NextSnippet.Enabled = false;
-            this.NextSnippet.Location = new System.Drawing.Point(504, 630);
+            this.NextSnippet.Location = new System.Drawing.Point(762, 442);
             this.NextSnippet.Name = "NextSnippet";
             this.NextSnippet.Size = new System.Drawing.Size(58, 26);
             this.NextSnippet.TabIndex = 23;
@@ -383,7 +383,7 @@
             // PrevSnippet
             // 
             this.PrevSnippet.Enabled = false;
-            this.PrevSnippet.Location = new System.Drawing.Point(440, 630);
+            this.PrevSnippet.Location = new System.Drawing.Point(698, 442);
             this.PrevSnippet.Name = "PrevSnippet";
             this.PrevSnippet.Size = new System.Drawing.Size(58, 26);
             this.PrevSnippet.TabIndex = 24;
@@ -393,7 +393,7 @@
             // PageDisplay
             // 
             this.PageDisplay.Font = new System.Drawing.Font("Microsoft JhengHei", 11F);
-            this.PageDisplay.Location = new System.Drawing.Point(-3, 630);
+            this.PageDisplay.Location = new System.Drawing.Point(255, 442);
             this.PageDisplay.Margin = new System.Windows.Forms.Padding(3);
             this.PageDisplay.Name = "PageDisplay";
             this.PageDisplay.Size = new System.Drawing.Size(437, 26);
@@ -404,6 +404,7 @@
             // 
             this.NormalPanel.Controls.Add(this.label3);
             this.NormalPanel.Controls.Add(this.PageDisplay);
+            this.NormalPanel.Controls.Add(this.FieldListView);
             this.NormalPanel.Controls.Add(this.Submit);
             this.NormalPanel.Controls.Add(this.PrevSnippet);
             this.NormalPanel.Controls.Add(this.label1);
@@ -414,7 +415,6 @@
             this.NormalPanel.Controls.Add(this.Remark);
             this.NormalPanel.Controls.Add(this.label9);
             this.NormalPanel.Controls.Add(this.SnippetTitle);
-            this.NormalPanel.Controls.Add(this.FieldListView);
             this.NormalPanel.Controls.Add(this.Snippet);
             this.NormalPanel.Controls.Add(this.OutputExtension);
             this.NormalPanel.Controls.Add(this.ProgressBar);
@@ -427,14 +427,14 @@
             this.NormalPanel.Enabled = false;
             this.NormalPanel.Location = new System.Drawing.Point(12, 12);
             this.NormalPanel.Name = "NormalPanel";
-            this.NormalPanel.Size = new System.Drawing.Size(1056, 699);
+            this.NormalPanel.Size = new System.Drawing.Size(1056, 800);
             this.NormalPanel.TabIndex = 26;
             // 
             // SnippetEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1076, 723);
+            this.ClientSize = new System.Drawing.Size(1076, 824);
             this.Controls.Add(this.StructGroup);
             this.Controls.Add(this.NormalPanel);
             this.Font = new System.Drawing.Font("Microsoft JhengHei", 9F);

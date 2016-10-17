@@ -36,7 +36,7 @@
             this.Panel1.AutoScroll = true;
             this.Panel1.Location = new System.Drawing.Point(0, 0);
             this.Panel1.Name = "Panel1";
-            this.Panel1.Size = new System.Drawing.Size(1104, 400);
+            this.Panel1.Size = new System.Drawing.Size(1247, 400);
             this.Panel1.TabIndex = 0;
             // 
             // FieldSetupPanel

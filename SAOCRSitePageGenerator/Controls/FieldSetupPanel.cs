@@ -68,19 +68,39 @@ namespace SAOCRSitePageGenerator
 
         private void GenerateFieldSetups(DataTable DT)
         {
-            for (int i = 0; i < DT.Rows.Count; i++)
+            try
             {
-                DataRow DR = DT.Rows[i];
-                string FieldName = Convert.ToString(DR[ReadOnly.SnippetFieldName]);
+                int FieldCount = DT.Select("[" + ReadOnly.SnippetFieldIndex + "] IS NOT NULL").Length;
+                int IndexCounter = 0, GeneratedFieldSetupCounter = 0;
 
-                FieldSetup FM = new FieldSetup(DR, SearchTestMethod);
-                FM.Name = FieldName;
-                FM.Top = i * FM.Height + ((i + 1) * 5);
-                FM.Left = FM.Margin.Left;
+                if (FieldCount > 0)
+                {
+                    while (GeneratedFieldSetupCounter < FieldCount)
+                    {
+                        DataRow[] DRA = DT.Select("[" + ReadOnly.SnippetFieldIndex + "]='" + IndexCounter + "'");
+                        foreach (DataRow DR in DRA)
+                        {
+                            string FieldName = Convert.ToString(DR[ReadOnly.SnippetFieldName]);
 
-                Panel1.Controls.Add(FM);
-                FieldCollection.Add(FieldName, FM);
-                FieldDataCollection.Add(FieldName, DR);
+                            FieldSetup FM = new FieldSetup(DR, SearchTestMethod);
+                            FM.Name = FieldName;
+                            FM.Top = GeneratedFieldSetupCounter * FM.Height + ((GeneratedFieldSetupCounter + 1) * 5);
+                            FM.Left = FM.Margin.Left;
+
+                            Panel1.Controls.Add(FM);
+                            FieldCollection.Add(FieldName, FM);
+                            FieldDataCollection.Add(FieldName, DR);
+
+                            GeneratedFieldSetupCounter++;
+                        }
+
+                        IndexCounter++;
+                    }
+                }
+            }
+            catch (EvaluateException)
+            {
+                throw new DataColumnNotExistException();
             }
         }
         #endregion

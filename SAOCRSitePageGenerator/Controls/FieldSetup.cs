@@ -34,23 +34,9 @@ namespace SAOCRSitePageGenerator
 
         private void InitializeControls()
         {
-            FieldName.Text = Convert.ToString(DR[ReadOnly.SnippetFieldName]);
-
-            try { AutoFill.Checked = isAuto = Convert.ToBoolean(DR[ReadOnly.SnippetFieldAutoFill] == DBNull.Value ? false : DR[ReadOnly.SnippetFieldAutoFill]); } catch(ArgumentException) { };
-            try { ReadOnlyAttribute.Checked = Convert.ToBoolean(DR[ReadOnly.SnippetFieldReadOnly] == DBNull.Value ? false : DR[ReadOnly.SnippetFieldReadOnly]); } catch (ArgumentException) { };
-            try { Internal.Checked = Convert.ToBoolean(DR[ReadOnly.SnippetFieldForInternalUse] == DBNull.Value ? false : DR[ReadOnly.SnippetFieldForInternalUse]); } catch (ArgumentException) { };
-            Value.Enabled = !ReadOnlyAttribute.Checked;
-            
-            try { DataSet.Text = Convert.ToString(DR[ReadOnly.SnippetFieldDataSet]); } catch (ArgumentException) { };
-            try { DataSource.Text = Convert.ToString(DR[ReadOnly.SnippetFieldDataSource]); } catch (ArgumentException) { };
-            try { DataSelect.Text = Convert.ToString(DR[ReadOnly.SnippetFieldDataSelect]); } catch (ArgumentException) { };
-            try { ProcessCMD.Text = Convert.ToString(DR[ReadOnly.SnippetFieldProcessCMD]).Replace("\\n", "\r\n") + "\r\n"; } catch (ArgumentException) { };
-
-            Auto.Enabled = isAuto && !ReadOnlyAttribute.Checked;
-            Value.Enabled = !isAuto && !ReadOnlyAttribute.Checked;
-            Process.Enabled = !ReadOnlyAttribute.Checked;
-
-            ProcessCMDCatalog.Items.AddRange(Enum.GetNames(typeof(StringProcessCMDType)));
+            LoadDataAndSetToControlByDataRow(DR);
+            SetControlByReadOnlyAttribute(ReadOnlyAttribute.Checked);
+            AddStringProcessCMDType();
         }
 
         private void InitializeEventHandler()
@@ -58,6 +44,7 @@ namespace SAOCRSitePageGenerator
             SizeChanged += FieldManage_SizeChanged;
 
             SearchTest.Click += SearchTest_Click;
+
             ProcessCMDView.Click += ProcessCMDView_Click;
             ProcessCMDAdd.Click += ProcessCMDAdd_Click;
             ProcessCMDTest.Click += ProcessCMDTest_Click;
@@ -78,12 +65,12 @@ namespace SAOCRSitePageGenerator
         {
             SetSearchTestResultView(!SearchResult.Visible);
 
-            if (!SearchResult.Visible)
+            if (SearchResult.Visible)
             {
                 if (InvokeRequired)
-                    SearchTestMethod?.Invoke(this, e);
+                    SetReturnSearchResultToResultLabel(SearchTestMethod?.Invoke(this, e));
                 else
-                    SearchTestMethod(this, e);
+                    SetReturnSearchResultToResultLabel(SearchTestMethod(this, e));
             }
         }
 
@@ -151,6 +138,13 @@ namespace SAOCRSitePageGenerator
             SearchTest.Text = isAtTestView ? "Back" : "Search Test";
         }
 
+        private void SetControlByReadOnlyAttribute(bool isReadOnly)
+        {
+            Auto.Enabled = isAuto && !isReadOnly;
+            ManualValue.Enabled = !isAuto && !isReadOnly;
+            Process.Enabled = !isReadOnly;
+        }
+
         private void AddCommandLineToProcess()
         {
             StringProcessor CMDProc = new StringProcessor();
@@ -167,21 +161,77 @@ namespace SAOCRSitePageGenerator
             }
         }
 
+        private void AddStringProcessCMDType()
+        {
+            ProcessCMDCatalog.Items.AddRange(Enum.GetNames(typeof(StringProcessCMDType)));
+        }
+
         private void ShowStringProcessTester()
         {
             StringProcessTester SPT = new StringProcessTester(ProcessCMD.Text);
             SPT.Show();
         }
+
+        private void SetReturnSearchResultToResultLabel(string Result)
+        {
+            SearchResult.Text = Result;
+        }
+
+        private void LoadDataAndSetToControlByDataRow(DataRow DR)
+        {
+            OrderIndex.Text = Convert.ToString(DR[ReadOnly.SnippetFieldIndex]);
+            FieldName.Text = Convert.ToString(DR[ReadOnly.SnippetFieldName]);
+
+            AutoFill.Checked = isAuto = GetBooleanFromDataRow(DR, ReadOnly.SnippetFieldAutoFill);
+            ReadOnlyAttribute.Checked = GetBooleanFromDataRow(DR, ReadOnly.SnippetFieldReadOnly);
+            Internal.Checked = GetBooleanFromDataRow(DR, ReadOnly.SnippetFieldForInternalUse);
+            LoopUse.Checked = GetBooleanFromDataRow(DR, ReadOnly.SnippetFieldDataForLoopUse);
+
+            ManualValue.Enabled = !ReadOnlyAttribute.Checked;
+
+            DS.Text = Convert.ToString(DR[ReadOnly.SnippetFieldDataSet]);
+            DT.Text = Convert.ToString(DR[ReadOnly.SnippetFieldDataTable]);
+            DTSelect.Text = Convert.ToString(DR[ReadOnly.SnippetFieldDataQuery]);
+            DTReturnColumnName.Text = Convert.ToString(DR[ReadOnly.SnippetFieldDataQueryReturnColumnName]);
+            ProcessCMD.Text = Convert.ToString(DR[ReadOnly.SnippetFieldProcessCMD]).Replace("\\n", "\r\n") + "\r\n";
+        }
         #endregion
+
+        private bool GetBooleanFromDataRow(DataRow DR, string ColumnName)
+        {
+            try
+            {
+                return Convert.ToBoolean(DR[ColumnName] == DBNull.Value ? false : DR[ColumnName]);
+            }
+            catch (ArgumentException)
+            {
+                throw new DataColumnNotExistException();
+            }
+        }
 
         public string GetManualValue()
         {
-            return Value.Text;
+            return ManualValue.Text;
         }
 
-        public DataRow GetDataRowSetToControl()
+        public string GetDataTableName()
         {
-            return DR;
+            return DT.Text;
+        }
+
+        public string GetDataSetName()
+        {
+            return DS.Text;
+        }
+
+        public string GetDataTableSelectQuery()
+        {
+            return DTSelect.Text;
+        }
+
+        public string GetDataTableReturnColumnName()
+        {
+            return DTReturnColumnName.Text;
         }
         #endregion
     }

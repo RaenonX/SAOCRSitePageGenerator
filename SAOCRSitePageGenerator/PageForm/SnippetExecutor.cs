@@ -50,14 +50,15 @@ namespace SAOCRSitePageGenerator
                 isRepeatedSnippet = Convert.ToBoolean(CM.GetConfig(ReadOnly.SnippetIsRepeatedSnippet));
                 OutputDestination.Text = CM.GetConfig(ReadOnly.SnippetDestination);
             }
+
+            SetGenerateButtonEnabled(FSP.Controls.Count > 1);
         }
         #endregion
 
         #region Events
-        private void SearchTest_Click(object sender, EventArgs e)
+        private string SearchTest_Click(object sender, EventArgs e)
         {
-            FieldSetup FM = (FieldSetup)sender;
-
+            return GetDTQueryResult((FieldSetup)sender, true);
         }
 
         private void Generate_Click(object sender, EventArgs e)
@@ -69,6 +70,11 @@ namespace SAOCRSitePageGenerator
         #region Methods
 
         #region Control Modifying
+        private void SetGenerateButtonEnabled(bool Enabled)
+        {
+            Generate.Enabled = Enabled;
+        }
+
         private void GenerateAndShowFieldSetupPanel(DataTable FieldList, SearchTestHandler SearchTestMethod)
         {
             FSP = new FieldSetupPanel(FieldList, SearchTestMethod);
@@ -122,10 +128,14 @@ namespace SAOCRSitePageGenerator
                     int MaxProgressCount = 4;
 
                     ReportProgress(1, MaxProgressCount, "Replacing field with manual data...");
-                    ReplaceManualField(ref SB, CM.GetConfig(ReadOnly.SnippetFieldBracketL), CM.GetConfig(ReadOnly.SnippetFieldBracketR));
+                    ReplaceFields(ref SB, CM.GetConfig(ReadOnly.SnippetFieldBracketL), CM.GetConfig(ReadOnly.SnippetFieldBracketR));
 
                     ReportProgress(2, MaxProgressCount, "Checking export file path...");
-                    CheckSnippetExportFile(SnippetExportPath);
+                    if (!CheckSnippetExportFile(SnippetExportPath))
+                    {
+                        ReportProgress(0, 0, "Export process aborted.");
+                        return;
+                    }
 
                     ReportProgress(3, MaxProgressCount, "Exporting snippet...");
                     WriteSnippet(SB, SnippetExportPath);
@@ -138,23 +148,96 @@ namespace SAOCRSitePageGenerator
             }
         }
 
-        #region Snippet Generating Process
-        private StringBuilder ReplaceManualField(ref StringBuilder SB, string BracketL, string BracketR)
+        private string GetDTQueryResult(FieldSetup FS, bool isLayout)
         {
-            foreach (DataRow DR in FieldList.Rows)
+            string DSNameInFS = FS.GetDataSetName();
+            string DTNameInFS = FS.GetDataTableName();
+            string DTSelectQuery = FS.GetDataTableSelectQuery();
+            string DTReturnColumnName = FS.GetDataTableReturnColumnName();
+
+            if (!Static.SnippetExternalSourceName.ContainsValue(DSNameInFS))
             {
-                string FieldName = Convert.ToString(DR[ReadOnly.SnippetFieldName]);
-                bool isAuto = Convert.ToBoolean(DR[ReadOnly.SnippetFieldAutoFill] == DBNull.Value ? false : DR[ReadOnly.SnippetFieldAutoFill]);
-                bool isInternal = Convert.ToBoolean(DR[ReadOnly.SnippetFieldForInternalUse] == DBNull.Value ? false : DR[ReadOnly.SnippetFieldForInternalUse]);
-                SB = !isAuto && !isInternal ? SB.Replace(BracketL + FieldName + BracketR, FSP.FieldCollection[FieldName].GetManualValue()) : SB;
+                return isLayout ? "Error: Specified DataSet not loaded or not exists." : string.Empty ;
+            } else if (string.IsNullOrEmpty(DSNameInFS))
+            {
+                return isLayout ? "Error: Specified DataSet name empty." : string.Empty;
+            } else if (string.IsNullOrEmpty(DTNameInFS))
+            {
+                return isLayout ? "Error: Specified DataTable name empty." : string.Empty;
+            } else if (string.IsNullOrEmpty(DTReturnColumnName))
+            {
+                return isLayout ? "Error: Specified return DT column name empty." : string.Empty;
+            } else
+            {
+                Guid DSGuid = Static.SnippetExternalSourceName.FirstOrDefault(x => x.Value == DSNameInFS).Key;
+                DataSet DSToUse = Static.SnippetExternalSourceDataSet[DSGuid];
+                DataRow[] DTQueried;
+                Guid DTGuid = new Guid(DSToUse.Tables[ReadOnly.SourceDataTableInfoTableName].Select("[" + ReadOnly.SourceDataTableName + "]='" + DTNameInFS + "'")[0][ReadOnly.SourceDataTableGUID].ToString());
+
+                try
+                {
+                    DTQueried = DSToUse.Tables[DTGuid.ToString()].Select(DTSelectQuery);
+                }
+                catch (Exception e)
+                {
+                    return "Error when querying data. Exception: " + e.GetType().ToString() + ", Message: " + e.Message;
+                }
+
+                return DTQueried.Length > 0 ? DTQueried[0][DTReturnColumnName].ToString() : (isLayout ? "Data not found" : string.Empty);
             }
-            return SB;
         }
 
-        private void CheckSnippetExportFile(string ExportPath)
+        #region Snippet Generating Process
+
+        private void ReplaceFields(ref StringBuilder SB, string BracketL, string BracketR)
+        {
+            using (DataTable TempDTForInternalUse = FieldList.Copy())
+            {
+                foreach (DataRow DR in FieldList.Rows)
+                {
+                    string FieldName = Convert.ToString(DR[ReadOnly.SnippetFieldName]);
+                    string FieldSectionToReplace = BracketL + FieldName + BracketR;
+                    bool isAuto = Convert.ToBoolean(DR[ReadOnly.SnippetFieldAutoFill] == DBNull.Value ? false : DR[ReadOnly.SnippetFieldAutoFill]);
+                    bool isInternal = Convert.ToBoolean(DR[ReadOnly.SnippetFieldForInternalUse] == DBNull.Value ? false : DR[ReadOnly.SnippetFieldForInternalUse]);
+
+                    if (isInternal)
+                    {
+                        SB = SB.Replace(FieldSectionToReplace, FSP.FieldCollection[FieldName].GetManualValue());
+
+                        DataRow[] DRA = TempDTForInternalUse.Select("[" + ReadOnly.SnippetFieldName + "]='" + FieldName + "'");
+                        DataRow DRT = DRA[0];
+
+                        if (isAuto)
+                        {
+                            DRT[ReadOnly.SnippetFieldManualValue] = GetDTQueryResult(FSP.FieldCollection[FieldName], false);
+                        }
+                        else
+                        {
+                            DRT[ReadOnly.SnippetFieldManualValue] = FSP.FieldCollection[FieldName].GetManualValue();
+                        }
+                    }
+                    else
+                    {
+                        if (isAuto)
+                        {
+                            SB = SB.Replace(FieldSectionToReplace, GetDTQueryResult(FSP.FieldCollection[FieldName], false));
+                        }
+                        else
+                        {
+                            SB = SB.Replace(FieldSectionToReplace, FSP.FieldCollection[FieldName].GetManualValue());
+                        }
+                    }
+                }
+            }
+        }
+
+        private bool CheckSnippetExportFile(string ExportPath)
         {
             if (!File.Exists(ExportPath))
+            {
                 using (FileStream FM = File.Create(ExportPath)) { }
+                return true;
+            }
             else
             {
                 switch (MessageBox.Show("Old exported snippet detected. Replace with new file?", "Old exported snippet detected", MessageBoxButtons.YesNo))
@@ -162,10 +245,10 @@ namespace SAOCRSitePageGenerator
                     case DialogResult.Yes:
                         File.Delete(ExportPath);
                         using (FileStream FM = File.Create(ExportPath)) { }
-                        break;
-                    case DialogResult.No:
+                        return true;
+                    default:
                         MessageBox.Show("Snippet output process aborted.");
-                        return;
+                        return false;
                 }
             }
         }
